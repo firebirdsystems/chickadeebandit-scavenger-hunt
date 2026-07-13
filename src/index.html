@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scavenger Hunt</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: var(--hub-bg, #f9fafb);
+      --surface: var(--hub-surface, #ffffff);
+      --border: var(--hub-border, #e5e7eb);
+      --border-mid: var(--hub-border, #d1d5db);
+      --text: var(--hub-text, #111827);
+      --muted: var(--hub-text-muted, #6b7280);
+      --accent: var(--hub-primary, #111827);
+      --accent-hover: var(--hub-primary-hover, #374151);
+      --accent-fg: var(--hub-primary-fg, #ffffff);
+      --radius: var(--hub-radius, 10px);
+      --green: #047857; --green-soft: #d1fae5;
+      --amber: #b45309; --amber-soft: #fef3c7;
+      --red: #b91c1c; --red-soft: #fee2e2;
+      --blue: #1d4ed8; --blue-soft: #dbeafe;
+      --shadow: 0 1px 3px rgba(15, 23, 42, .07);
+    }
+    body {
+      min-height: 100vh; background: var(--bg); color: var(--text);
+      font-family: var(--hub-font, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+      font-size: var(--hub-font-size, 15px); line-height: 1.5;
+    }
+    .app { max-width: 680px; margin: 0 auto; padding: 16px; }
+    .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+    h1 { font-size: 1.35rem; line-height: 1.2; }
+    h2 { font-size: .95rem; }
+    .muted { color: var(--muted); }
+    .tiny { font-size: .78rem; }
+    .stack { display: grid; gap: 8px; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      border: 1px solid transparent; border-radius: 8px; padding: 8px 12px;
+      font: inherit; font-size: .86rem; font-weight: 700; cursor: pointer;
+      min-height: 38px; background: var(--accent); color: var(--accent-fg);
+    }
+    .btn:hover { background: var(--accent-hover); }
+    .btn:disabled { opacity: .48; cursor: default; }
+    .btn-ghost { background: transparent; color: var(--text); border-color: var(--border-mid); }
+    .btn-ghost:hover { background: rgba(127,127,127,.08); }
+    .btn-danger { background: var(--red-soft); color: var(--red); }
+    .btn-sm { min-height: 31px; padding: 5px 10px; font-size: .78rem; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px; }
+    .back { background: none; border: 0; color: var(--muted); cursor: pointer; font: inherit; font-size: .82rem; font-weight: 700; padding: 0; margin-bottom: 8px; }
+    .hunt-card {
+      display: flex; align-items: center; gap: 12px; padding: 13px 14px; width: 100%;
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: var(--shadow); cursor: pointer; text-align: left; font: inherit; color: var(--text);
+    }
+    .hunt-card:hover { border-color: var(--accent); }
+    .hunt-body { flex: 1; min-width: 0; }
+    .hunt-title { font-weight: 750; }
+    .hunt-meta { color: var(--muted); font-size: .8rem; }
+    .pill {
+      display: inline-flex; align-items: center; min-height: 20px; padding: 1px 9px;
+      border-radius: 999px; white-space: nowrap; background: #f1f5f9; color: var(--muted);
+      font-size: .72rem; font-weight: 800;
+    }
+    .pill.open { background: var(--green-soft); color: var(--green); }
+    .pill.draft { background: var(--amber-soft); color: var(--amber); }
+    .pill.closed { background: var(--blue-soft); color: var(--blue); }
+    .task-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 13px 14px; }
+    .task-title { font-weight: 750; font-size: .95rem; }
+    .task-points { color: var(--muted); font-size: .74rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+    .sealed { color: var(--muted); font-size: .82rem; margin-top: 8px; }
+    .submit-row { display: flex; gap: 6px; margin-top: 9px; flex-wrap: wrap; align-items: center; }
+    .submit-row input[type="text"] { flex: 1; min-width: 140px; }
+    .finds { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin-top: 10px; }
+    .find { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--bg); }
+    .find img { width: 100%; height: 110px; object-fit: cover; display: block; }
+    .find .find-meta { padding: 6px 8px; font-size: .76rem; }
+    .find .who { font-weight: 800; }
+    .award-row { display: flex; align-items: center; gap: 5px; margin-top: 4px; }
+    .award-row input { width: 54px; padding: 3px 6px; font-size: .78rem; }
+    .score-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+    .score-rank { font-weight: 800; width: 24px; text-align: center; }
+    .score-name { flex: 1; font-weight: 700; }
+    .score-pts { font-weight: 800; }
+    .empty { color: var(--muted); text-align: center; padding: 30px 16px; }
+    .error { background: var(--red-soft); color: var(--red); padding: 9px 12px; border-radius: 8px; margin-bottom: 10px; font-size: .86rem; }
+    .section-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 18px 2px 8px; }
+    input, textarea {
+      border: 1.5px solid var(--border-mid); border-radius: 8px;
+      padding: 9px 11px; font: inherit; background: var(--surface); color: var(--text); width: 100%;
+    }
+    input:focus, textarea:focus { outline: none; border-color: var(--accent); }
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.42); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px; }
+    .modal { background: var(--surface); border-radius: 14px; padding: 22px; width: 100%; max-width: 440px; box-shadow: 0 20px 60px rgba(0,0,0,.25); max-height: 92vh; overflow-y: auto; }
+    .modal h2 { font-size: 1.05rem; margin-bottom: 16px; }
+    .form { display: grid; gap: 12px; }
+    .field { display: grid; gap: 5px; }
+    .grid2 { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
+    label { font-size: .74rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 800; }
+    .modal-actions { display: flex; gap: 8px; margin-top: 6px; justify-content: flex-end; }
+  </style>
+  <base href="/run/scavenger-hunt/">
+</head>
+<body>
+<div class="app">
+  <div id="root" class="empty">Loading…</div>
+</div>
+
+<script type="module">
+import { esc, hubConfirm, hubAlert, createFilesHelper } from "/hub-sdk.js";
+import {
+  isOrganizer, statusLabel, visibleHunts, huntTasks, submissionFor,
+  foundCount, awardBySubmission, scoreboard,
+} from "./logic.js";
+
+const CONTEXT = window.__CONTEXT_URL ?? "";
+const DB = window.__DB_URL ?? "";
+const HUB_MEMBER = window.__CURRENT_MEMBER ?? null;
+const files = createFilesHelper(window.__FILES_URL ?? "");
+
+let members = [];
+let memberMap = new Map();
+let me = null;
+let hunts = [];
+let tasks = [];
+let submissions = []; // hub-filtered: mine + revealed hunts
+let awards = [];
+let openHuntId = null;
+let error = "";
+let modalEl = null;
+
+function nowIso() { return new Date().toISOString(); }
+function memberName(id) { return memberMap.get(id)?.name ?? "Someone"; }
+
+/* ── DB helper ─────────────────────────────────────────────────────────────── */
+async function db(sql, params = []) {
+  if (!DB) return { rows: [] };
+  const res = await fetch(DB, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sql, params }),
+  });
+  const json = await res.json();
+  if (json.error) throw new Error(json.error);
+  return json;
+}
+
+/* ── Loading ───────────────────────────────────────────────────────────────── */
+async function loadMembers() {
+  if (!CONTEXT) {
+    members = [
+      { id: "demo-1", name: "Alex", role: "adult" },
+      { id: "demo-3", name: "Casey", role: "child" },
+    ];
+  } else {
+    try {
+      const res = await fetch(`${CONTEXT}?keys=family.members`);
+      members = ((await res.json())["family.members"]) ?? [];
+    } catch { members = []; }
+  }
+  memberMap = new Map(members.map((m) => [m.id, m]));
+  me = HUB_MEMBER ?? members[0] ?? { id: "guest", name: "Guest", role: "adult" };
+}
+
+async function loadData() {
+  if (!DB) {
+    hunts = [{ id: "h1", title: "Backyard Safari", status: "open", visibility: "everyone", created_by: "demo-1", created_at: nowIso() }];
+    tasks = [
+      { id: "t1", hunt_id: "h1", title: "Something older than Dad", points: 2, sort_order: 0, created_by: "demo-1", created_at: nowIso() },
+      { id: "t2", hunt_id: "h1", title: "A bug (photo only, be kind)", points: 1, sort_order: 1, created_by: "demo-1", created_at: nowIso() },
+    ];
+    submissions = [];
+    awards = [];
+    return;
+  }
+  const [h, t, s, a] = await Promise.all([
+    db("SELECT id, title, status, visibility, created_by, created_at FROM app_scavenger_hunt__hunts ORDER BY created_at DESC LIMIT 50"),
+    db("SELECT id, hunt_id, title, points, sort_order, created_by, created_at FROM app_scavenger_hunt__tasks LIMIT 600"),
+    db("SELECT id, hunt_id, task_id, member_id, photo_file_id, caption, created_at FROM app_scavenger_hunt__submissions LIMIT 1500"),
+    db("SELECT id, hunt_id, submission_id, points_awarded, awarded_by, created_at FROM app_scavenger_hunt__awards LIMIT 1500"),
+  ]);
+  hunts = h.rows ?? [];
+  tasks = t.rows ?? [];
+  submissions = s.rows ?? [];
+  awards = a.rows ?? [];
+}
+
+async function refresh() {
+  error = "";
+  try {
+    await Promise.all([loadMembers(), loadData()]);
+    if (openHuntId && !hunts.some((h) => h.id === openHuntId)) openHuntId = null;
+    render();
+  } catch (e) { error = e.message; render(); }
+}
+
+function showError(msg) { error = msg; render(); }
+
+/* ── Mutations ─────────────────────────────────────────────────────────────── */
+async function createHunt(title) {
+  const row = { id: crypto.randomUUID(), title, status: "draft", visibility: "everyone", created_by: me.id, created_at: nowIso() };
+  hunts = [row, ...hunts];
+  openHuntId = row.id;
+  closeModal(); render();
+  try {
+    await db("INSERT INTO app_scavenger_hunt__hunts (id, title, status, visibility, created_by, created_at) VALUES (?,?,?,?,?,?)",
+      [row.id, row.title, row.status, row.visibility, row.created_by, row.created_at]);
+  } catch (e) {
+    hunts = hunts.filter((h) => h.id !== row.id);
+    openHuntId = null;
+    showError(e.message);
+  }
+}
+
+async function setHuntStatus(id, status) {
+  const idx = hunts.findIndex((h) => h.id === id);
+  if (idx === -1) return;
+  const prev = hunts[idx];
+  hunts[idx] = { ...prev, status };
+  render();
+  try {
+    await db("UPDATE app_scavenger_hunt__hunts SET status=? WHERE id=?", [status, id]);
+    if (status === "closed") await refresh(); // sealed submissions just released
+  } catch (e) { hunts[idx] = prev; showError(e.message); }
+}
+
+async function deleteHunt(id) {
+  const ok = await hubConfirm({ message: "Delete this hunt?", description: "Tasks, photos, and scores go with it.", confirmLabel: "Delete", destructive: true });
+  if (!ok) return;
+  const prev = hunts;
+  hunts = hunts.filter((h) => h.id !== id);
+  if (openHuntId === id) openHuntId = null;
+  render();
+  try { await db("DELETE FROM app_scavenger_hunt__hunts WHERE id=?", [id]); }
+  catch (e) { hunts = prev; showError(e.message); }
+}
+
+async function addTask(huntId, title, points) {
+  const row = { id: crypto.randomUUID(), hunt_id: huntId, title, points, sort_order: huntTasks(tasks, huntId).length, created_by: me.id, created_at: nowIso() };
+  tasks = [...tasks, row];
+  closeModal(); render();
+  try {
+    await db("INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?,?,?,?,?,?,?)",
+      [row.id, row.hunt_id, row.title, row.points, row.sort_order, row.created_by, row.created_at]);
+  } catch (e) { tasks = tasks.filter((t) => t.id !== row.id); showError(e.message); }
+}
+
+async function deleteTask(id) {
+  const prev = tasks;
+  tasks = tasks.filter((t) => t.id !== id);
+  render();
+  try { await db("DELETE FROM app_scavenger_hunt__tasks WHERE id=?", [id]); }
+  catch (e) { tasks = prev; showError(e.message); }
+}
+
+async function submitFind(hunt, taskId, file, caption) {
+  let fileId = "";
+  if (file) {
+    try {
+      const up = await files.upload(file);
+      fileId = up.id;
+    } catch (e) { showError(`Photo upload failed: ${e.message}`); return; }
+  }
+  const row = { id: crypto.randomUUID(), hunt_id: hunt.id, task_id: taskId, member_id: me.id, photo_file_id: fileId, caption, created_at: nowIso() };
+  submissions = [...submissions, row];
+  render();
+  try {
+    await db("INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, photo_file_id, caption, created_at) VALUES (?,?,?,?,?,?,?)",
+      [row.id, row.hunt_id, row.task_id, row.member_id, row.photo_file_id, row.caption, row.created_at]);
+  } catch (e) {
+    submissions = submissions.filter((s) => s.id !== row.id);
+    if (fileId) files.delete(fileId).catch(() => {});
+    showError(e.message);
+  }
+}
+
+async function awardPoints(hunt, submissionId, points) {
+  const existing = awards.find((a) => a.submission_id === submissionId);
+  if (existing) {
+    const prev = { ...existing };
+    existing.points_awarded = points;
+    render();
+    try { await db("UPDATE app_scavenger_hunt__awards SET points_awarded=? WHERE id=?", [points, existing.id]); }
+    catch (e) { Object.assign(existing, prev); showError(e.message); }
+    return;
+  }
+  const row = { id: crypto.randomUUID(), hunt_id: hunt.id, submission_id: submissionId, points_awarded: points, awarded_by: me.id, created_at: nowIso() };
+  awards = [...awards, row];
+  render();
+  try {
+    await db("INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?,?,?,?,?,?)",
+      [row.id, row.hunt_id, row.submission_id, row.points_awarded, row.awarded_by, row.created_at]);
+  } catch (e) { awards = awards.filter((a) => a.id !== row.id); showError(e.message); }
+}
+
+/* ── Rendering ─────────────────────────────────────────────────────────────── */
+function renderHuntList() {
+  const list = visibleHunts(hunts, me);
+  return `
+    <div class="topbar">
+      <div>
+        <h1>🔎 Scavenger Hunt</h1>
+        <p class="muted tiny">Everyone hunts in secret. Photos reveal all at once.</p>
+      </div>
+      <button class="btn" data-new-hunt>+ New hunt</button>
+    </div>
+    ${error ? `<div class="error">${esc(error)}</div>` : ""}
+    ${list.length ? `<div class="stack">${list.map((h) => {
+      const count = huntTasks(tasks, h.id).length;
+      return `
+      <button class="hunt-card" data-open="${esc(h.id)}">
+        <div class="hunt-body">
+          <div class="hunt-title">${esc(h.title)}</div>
+          <div class="hunt-meta">By ${esc(memberName(h.created_by))} · ${count} thing${count === 1 ? "" : "s"} to find</div>
+        </div>
+        <span class="pill ${esc(h.status)}">${esc(statusLabel(h.status))}</span>
+      </button>`;
+    }).join("")}</div>` : `<div class="card empty">No hunts yet — set one up!</div>`}
+  `;
+}
+
+function renderFind(hunt, s, organizer) {
+  const awardMap = awardBySubmission(awards, hunt.id);
+  const award = awardMap.get(s.id);
+  return `
+    <div class="find">
+      ${s.photo_file_id ? `<img src="${esc(files.url(s.photo_file_id))}" alt="Find by ${esc(memberName(s.member_id))}" loading="lazy" />` : ""}
+      <div class="find-meta">
+        <span class="who">${esc(memberName(s.member_id))}</span>
+        ${s.caption ? ` — ${esc(s.caption)}` : ""}
+        ${award ? `<div>🏅 ${esc(String(Number(award.points_awarded)))} pts</div>` : ""}
+        ${organizer && hunt.status === "closed" ? `
+          <div class="award-row">
+            <input type="number" min="0" max="99" value="${award ? esc(String(Number(award.points_awarded))) : ""}" data-award-input="${esc(s.id)}" placeholder="pts" />
+            <button class="btn btn-ghost btn-sm" data-award="${esc(s.id)}">Award</button>
+          </div>` : ""}
+      </div>
+    </div>`;
+}
+
+function renderTask(hunt, task, organizer) {
+  const mine = submissionFor(submissions, task.id, me?.id);
+  const taskSubs = submissions.filter((s) => s.task_id === task.id);
+  return `
+    <div class="task-card">
+      <div class="task-points">${esc(String(Number(task.points) || 1))} pt${Number(task.points) === 1 ? "" : "s"}</div>
+      <div class="task-title">${esc(task.title)}</div>
+      ${organizer && hunt.status === "draft" ? `<div class="sealed"><button class="btn btn-ghost btn-sm" data-delete-task="${esc(task.id)}">Remove</button></div>` : ""}
+      ${hunt.status === "open" ? (mine
+        ? `<div class="sealed">🔒 Your find is in${mine.caption ? `: <strong>${esc(mine.caption)}</strong>` : ""}. Sealed until the reveal.</div>`
+        : `
+          <form class="submit-row" data-find-form="${esc(task.id)}">
+            ${window.__FILES_URL ? `<input type="file" accept="image/*" capture="environment" />` : ""}
+            <input type="text" placeholder="Caption (optional)" maxlength="120" />
+            <button type="submit" class="btn btn-sm">Submit find</button>
+          </form>`) : ""}
+      ${hunt.status === "closed" ? (taskSubs.length
+        ? `<div class="finds">${taskSubs.map((s) => renderFind(hunt, s, organizer)).join("")}</div>`
+        : `<div class="sealed">Nobody found this one.</div>`) : ""}
+    </div>`;
+}
+
+function renderHunt(hunt) {
+  const organizer = isOrganizer(hunt, me);
+  const ts = huntTasks(tasks, hunt.id);
+  const myFinds = foundCount(submissions, tasks, hunt.id, me?.id);
+  const scores = scoreboard(awards, submissions, hunt.id);
+  return `
+    <button class="back" data-back>← All hunts</button>
+    <div class="topbar">
+      <div>
+        <h1>${esc(hunt.title)}</h1>
+        <p class="muted tiny">${esc(statusLabel(hunt.status))} · by ${esc(memberName(hunt.created_by))}${hunt.status === "open" ? ` · you've found ${myFinds}/${ts.length}` : ""}</p>
+      </div>
+      ${organizer ? `
+        <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end">
+          ${hunt.status === "draft" ? `<button class="btn btn-sm" data-start-hunt>Start the hunt</button>` : ""}
+          ${hunt.status === "open" ? `<button class="btn btn-sm" data-close-hunt>End & reveal</button>` : ""}
+          ${hunt.status === "draft" ? `<button class="btn btn-ghost btn-sm" data-add-task>+ Thing to find</button>` : ""}
+          <button class="btn btn-danger btn-sm" data-delete-hunt>Delete</button>
+        </div>` : ""}
+    </div>
+    ${error ? `<div class="error">${esc(error)}</div>` : ""}
+    ${hunt.status === "closed" && scores.length ? `
+      <div class="section-head"><h2>🏆 Scoreboard</h2></div>
+      <div class="stack" style="margin-bottom:14px">
+        ${scores.map((s, i) => `
+          <div class="score-row">
+            <span class="score-rank">${i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}</span>
+            <span class="score-name">${esc(memberName(s.member_id))}</span>
+            <span class="score-pts">${s.points} pts · ${s.finds} finds</span>
+          </div>`).join("")}
+      </div>` : ""}
+    ${ts.length
+      ? `<div class="stack">${ts.map((t) => renderTask(hunt, t, organizer)).join("")}</div>`
+      : `<div class="card empty tiny">${organizer ? "Add things to find, then start the hunt." : "The organizer is still building the list."}</div>`}
+  `;
+}
+
+function render() {
+  const root = document.getElementById("root");
+  root.className = "app-root";
+  const hunt = openHuntId ? hunts.find((h) => h.id === openHuntId) : null;
+  root.innerHTML = hunt ? renderHunt(hunt) : renderHuntList();
+  root.querySelectorAll("[data-find-form]").forEach((form) => {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const taskId = form.getAttribute("data-find-form");
+      const file = form.querySelector('input[type="file"]')?.files?.[0] ?? null;
+      const caption = form.querySelector('input[type="text"]').value.trim();
+      if (!file && !caption) { hubAlert("Add a photo or a caption so there's some proof!"); return; }
+      const btn = form.querySelector("button");
+      if (btn) { btn.disabled = true; btn.textContent = "Sealing…"; }
+      submitFind(hunt, taskId, file, caption).catch((err) => showError(err.message));
+    });
+  });
+}
+
+/* ── Modals ────────────────────────────────────────────────────────────────── */
+function openModal(html) {
+  closeModal();
+  modalEl = document.createElement("div");
+  modalEl.className = "overlay";
+  modalEl.innerHTML = `<div class="modal">${html}</div>`;
+  modalEl.addEventListener("click", (e) => { if (e.target === modalEl) closeModal(); });
+  document.body.appendChild(modalEl);
+}
+function closeModal() { modalEl?.remove(); modalEl = null; }
+
+function openHuntEditor() {
+  openModal(`
+    <h2>New scavenger hunt</h2>
+    <form class="form" id="hunt-form">
+      <div class="field"><label for="h-title">Title</label><input id="h-title" data-autofocus placeholder="Backyard Safari" required /></div>
+      <p class="tiny muted">You'll be the organizer: add things to find, start the hunt, then end it for the big reveal.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-cancel>Cancel</button>
+        <button type="submit" class="btn">Create</button>
+      </div>
+    </form>`);
+  modalEl.querySelector("[data-autofocus]")?.focus();
+  modalEl.querySelector("#hunt-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const title = document.getElementById("h-title").value.trim();
+    if (!title) { document.getElementById("h-title").focus(); return; }
+    const btn = modalEl?.querySelector('button[type="submit"]');
+    if (btn) { btn.disabled = true; btn.textContent = "Creating…"; }
+    createHunt(title).catch((err) => showError(err.message));
+  });
+}
+
+function openTaskEditor(huntId) {
+  openModal(`
+    <h2>Add a thing to find</h2>
+    <form class="form" id="task-form">
+      <div class="field"><label for="t-title">Find…</label><input id="t-title" data-autofocus placeholder="Something older than Dad" required /></div>
+      <div class="grid2">
+        <div></div>
+        <div class="field"><label for="t-points">Points</label><input id="t-points" type="number" min="1" max="10" value="1" /></div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-cancel>Cancel</button>
+        <button type="submit" class="btn">Add</button>
+      </div>
+    </form>`);
+  modalEl.querySelector("[data-autofocus]")?.focus();
+  modalEl.querySelector("#task-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const title = document.getElementById("t-title").value.trim();
+    if (!title) { document.getElementById("t-title").focus(); return; }
+    const points = Math.max(1, Math.min(10, Number(document.getElementById("t-points").value) || 1));
+    const btn = modalEl?.querySelector('button[type="submit"]');
+    if (btn) { btn.disabled = true; btn.textContent = "Adding…"; }
+    addTask(huntId, title, points).catch((err) => showError(err.message));
+  });
+}
+
+/* ── Events ────────────────────────────────────────────────────────────────── */
+document.addEventListener("click", (e) => {
+  const t = e.target.closest("button");
+  if (!t) return;
+  const hunt = openHuntId ? hunts.find((h) => h.id === openHuntId) : null;
+  if (t.hasAttribute("data-open")) { openHuntId = t.getAttribute("data-open"); render(); return; }
+  if (t.hasAttribute("data-back")) { openHuntId = null; render(); return; }
+  if (t.hasAttribute("data-cancel")) { closeModal(); return; }
+  if (t.hasAttribute("data-new-hunt")) { openHuntEditor(); return; }
+  if (!hunt) return;
+  if (t.hasAttribute("data-add-task")) { openTaskEditor(hunt.id); return; }
+  if (t.hasAttribute("data-delete-task")) { deleteTask(t.getAttribute("data-delete-task")).catch((err) => showError(err.message)); return; }
+  if (t.hasAttribute("data-start-hunt")) {
+    if (!huntTasks(tasks, hunt.id).length) { hubAlert("Add at least one thing to find first."); return; }
+    setHuntStatus(hunt.id, "open").catch((err) => showError(err.message));
+    return;
+  }
+  if (t.hasAttribute("data-close-hunt")) { setHuntStatus(hunt.id, "closed").catch((err) => showError(err.message)); return; }
+  if (t.hasAttribute("data-delete-hunt")) { deleteHunt(hunt.id); return; }
+  if (t.hasAttribute("data-award")) {
+    const sid = t.getAttribute("data-award");
+    const input = document.querySelector(`input[data-award-input="${CSS.escape(sid)}"]`);
+    const pts = Math.max(0, Math.min(99, Number(input?.value) || 0));
+    awardPoints(hunt, sid, pts).catch((err) => showError(err.message));
+  }
+});
+
+refresh();
+</script>
+</body>
+</html>

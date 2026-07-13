@@ -1,0 +1,71 @@
+{
+  "scenarios": [
+    {
+      "name": "submissions stay sealed until the organizer closes; only the organizer adds tasks and awards",
+      "members": { "organizer": "adult", "hunter": "adult" },
+      "steps": [
+        {
+          "action": "db",
+          "as": "organizer",
+          "sql": "INSERT INTO app_scavenger_hunt__hunts (id, title, status, visibility, created_by, created_at) VALUES (?, 'Test Hunt', 'open', 'everyone', ?, '2099-01-01T00:00:00Z')",
+          "params": ["hunt-1", "{{organizer}}"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "organizer",
+          "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, 'A red leaf', 1, 0, ?, '2099-01-01T00:01:00Z')",
+          "params": ["task-1", "hunt-1", "{{organizer}}"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "hunter",
+          "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, 'Forged task', 1, 1, ?, '2099-01-01T00:02:00Z')",
+          "params": ["task-forged", "hunt-1", "{{hunter}}"],
+          "expect": { "status": 403 }
+        },
+        {
+          "action": "db",
+          "as": "hunter",
+          "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, photo_file_id, caption, created_at) VALUES (?, ?, ?, ?, '', 'found it', '2099-01-01T00:03:00Z')",
+          "params": ["sub-1", "hunt-1", "task-1", "{{hunter}}"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "organizer",
+          "sql": "SELECT id FROM app_scavenger_hunt__submissions",
+          "expect": { "status": 200, "rowCount": 0 }
+        },
+        {
+          "action": "db",
+          "as": "hunter",
+          "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, 99, ?, '2099-01-01T00:04:00Z')",
+          "params": ["award-forged", "hunt-1", "sub-1", "{{hunter}}"],
+          "expect": { "status": 403 }
+        },
+        {
+          "action": "db",
+          "as": "organizer",
+          "sql": "UPDATE app_scavenger_hunt__hunts SET status='closed' WHERE id = ?",
+          "params": ["hunt-1"],
+          "expect": { "status": 200 }
+        },
+        {
+          "action": "db",
+          "as": "organizer",
+          "sql": "SELECT id, caption FROM app_scavenger_hunt__submissions",
+          "expect": { "status": 200, "rowCount": 1, "rowsContain": [{ "id": "sub-1" }] }
+        },
+        {
+          "action": "db",
+          "as": "organizer",
+          "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, 1, ?, '2099-01-01T00:05:00Z')",
+          "params": ["award-1", "hunt-1", "sub-1", "{{organizer}}"],
+          "expect": { "status": 200 }
+        }
+      ]
+    }
+  ]
+}
