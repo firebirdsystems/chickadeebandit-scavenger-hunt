@@ -1,5 +1,6 @@
 {
   "id": "scavenger-hunt",
+  "contexts": ["household", "shared_space"],
   "name": "Scavenger Hunt",
   "version": "1.0.0",
   "description": "Set a list of things to find, everyone hunts and submits photo proof in secret, then the big reveal — see everyone's finds at once and award points.",
