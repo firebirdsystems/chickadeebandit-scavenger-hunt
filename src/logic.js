@@ -63,3 +63,12 @@ export function scoreboard(awards, submissions, huntId) {
   }
   return [...totals.values()].sort((a, b) => b.points - a.points || b.finds - a.finds);
 }
+
+/**
+ * Fields the in-app search matches against (see hub-sdk `searchMatch`).
+ * A hunt carries only its title, so the organiser is passed in —
+ * "the one Mia ran" is how an old hunt gets found.
+ */
+export function searchableFields(hunt, organizerName = "") {
+  return [hunt.title, organizerName];
+}

@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   isOrganizer, statusLabel, visibleHunts, huntTasks, submissionFor,
-  foundCount, awardBySubmission, scoreboard,
+  foundCount, awardBySubmission, scoreboard, searchableFields,
 } from "../src/logic.js";
 
 const me = { id: "org-1", role: "adult" };
@@ -72,5 +72,13 @@ describe("statusLabel", () => {
     expect(statusLabel("draft")).toBe("Draft");
     expect(statusLabel("open")).toMatch(/hunt is on/);
     expect(statusLabel("closed")).toBe("Revealed");
+  });
+});
+
+describe("searchableFields", () => {
+  it("matches on the organiser passed in alongside the hunt title", () => {
+    const fields = searchableFields({ title: "Garden hunt" }, "Mia");
+    expect(fields).toContain("Garden hunt");
+    expect(fields).toContain("Mia");
   });
 });
