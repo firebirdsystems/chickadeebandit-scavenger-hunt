@@ -24,7 +24,17 @@
       "member_column": "created_by",
       "visibility_column": "visibility",
       "everyone_values": ["everyone"],
-      "write_owner_only": true
+      "write_owner_only": true,
+      "retain_days": {
+        "default": 365,
+        "timestamp_column": "created_at",
+        "override_key": "hunt_history",
+        "dependent_tables": [
+          { "table": "tasks", "foreign_key": "hunt_id" },
+          { "table": "submissions", "foreign_key": "hunt_id", "file_id_column": "photo_file_id" },
+          { "table": "awards", "foreign_key": "hunt_id" }
+        ]
+      }
     },
     "tasks": {
       "kind": "inherit_visibility",
@@ -57,6 +67,22 @@
       "writer_column": "awarded_by",
       "insert_only_by_parent_column_member": "created_by"
     }
+  },
+  "delete_cascades": {
+    "hunts": [
+      { "table": "tasks", "foreign_key": "hunt_id" },
+      { "table": "submissions", "foreign_key": "hunt_id", "file_id_column": "photo_file_id" },
+      { "table": "awards", "foreign_key": "hunt_id" }
+    ],
+    "tasks": [
+      { "table": "submissions", "foreign_key": "task_id", "file_id_column": "photo_file_id" }
+    ]
+  },
+  "member_references": {
+    "hunts": { "column": "created_by", "on_removed": "keep" },
+    "tasks": { "column": "created_by", "on_removed": "keep" },
+    "submissions": { "column": "member_id", "on_removed": "delete", "file_id_column": "photo_file_id" },
+    "awards": { "column": "awarded_by", "on_removed": "keep" }
   },
   "nav": { "label": "Hunt" },
   "resource_limits": {

@@ -174,16 +174,34 @@ async function loadData() {
     awards = [];
     return;
   }
-  const [h, t, s, a] = await Promise.all([
-    db("SELECT id, title, status, visibility, created_by, created_at FROM app_scavenger_hunt__hunts ORDER BY created_at DESC LIMIT 50"),
-    db("SELECT id, hunt_id, title, points, sort_order, created_by, created_at FROM app_scavenger_hunt__tasks LIMIT 600"),
-    db("SELECT id, hunt_id, task_id, member_id, photo_file_id, caption, created_at FROM app_scavenger_hunt__submissions LIMIT 1500"),
-    db("SELECT id, hunt_id, submission_id, points_awarded, awarded_by, created_at FROM app_scavenger_hunt__awards LIMIT 1500"),
-  ]);
+  const h = await db("SELECT id, title, status, visibility, created_by, created_at FROM app_scavenger_hunt__hunts ORDER BY created_at DESC LIMIT 50");
   hunts = h.rows ?? [];
-  tasks = t.rows ?? [];
-  submissions = s.rows ?? [];
-  awards = a.rows ?? [];
+  ({ tasks, submissions, awards } = await loadChildrenFor(hunts));
+}
+
+/**
+ * Tasks, submissions and awards for exactly the hunts we loaded.
+ *
+ * These used to be blind `LIMIT 600` / `LIMIT 1500` reads with NO `ORDER BY`,
+ * which is an arbitrary slice once the table outgrows the number — the hunt on
+ * screen could render with some of its tasks missing and a scoreboard that
+ * silently under-counts, with no error anywhere. Scoping to the 50 loaded hunts
+ * bounds the read by the same window the UI actually shows, instead of by a
+ * number that ages out. (Question of the Day had the identical defect; this is
+ * the same fix.)
+ */
+async function loadChildrenFor(huntList) {
+  if (!huntList.length) return { tasks: [], submissions: [], awards: [] };
+  const ids = huntList.map((h) => h.id);
+  const holes = ids.map(() => "?").join(",");
+  const [t, s, a] = await Promise.all([
+    db(`SELECT id, hunt_id, title, points, sort_order, created_by, created_at FROM app_scavenger_hunt__tasks WHERE hunt_id IN (${holes})`, ids),
+    // The hub's sealed_until policy filters this to my own submissions plus
+    // everything on hunts that have closed — no client-side gating needed.
+    db(`SELECT id, hunt_id, task_id, member_id, photo_file_id, caption, created_at FROM app_scavenger_hunt__submissions WHERE hunt_id IN (${holes})`, ids),
+    db(`SELECT id, hunt_id, submission_id, points_awarded, awarded_by, created_at FROM app_scavenger_hunt__awards WHERE hunt_id IN (${holes})`, ids),
+  ]);
+  return { tasks: t.rows ?? [], submissions: s.rows ?? [], awards: a.rows ?? [] };
 }
 
 async function refresh() {
@@ -225,6 +243,24 @@ async function setHuntStatus(id, status) {
   } catch (e) { hunts[idx] = prev; showError(e.message); }
 }
 
+/*
+ * Proof photos live in hub file storage; the DB row only holds the id. The FK
+ * cascade removes the submission rows but knows nothing about R2, so a deleted
+ * hunt used to strand every one of its photos — unreachable and still billed.
+ *
+ * This was fixed once in the client, by collecting the ids from the loaded
+ * `submissions` before the delete and sweeping the bytes after. That could
+ * never work: submissions are `sealed_until` the hunt CLOSES, so until then the
+ * organizer's own client can only see their own — deleting an open hunt (the
+ * ordinary abandon case) swept one photo and stranded everyone else's. The
+ * paging cap was a second way to miss rows.
+ *
+ * `manifest.delete_cascades` does it server-side instead: the engine reads
+ * `photo_file_id` off the doomed rows (no row policy in its way), deletes the
+ * children inside the parent DELETE's transaction, and records the file
+ * reclaim in a durable outbox — so it also survives the tab closing mid-delete.
+ * Nothing is left for the client to do but the optimistic update.
+ */
 async function deleteHunt(id) {
   const ok = await hubConfirm({ message: "Delete this hunt?", description: "Tasks, photos, and scores go with it.", confirmLabel: "Delete", destructive: true });
   if (!ok) return;
@@ -232,7 +268,12 @@ async function deleteHunt(id) {
   hunts = hunts.filter((h) => h.id !== id);
   if (openHuntId === id) openHuntId = null;
   render();
-  try { await db("DELETE FROM app_scavenger_hunt__hunts WHERE id=?", [id]); }
+  try {
+    await db("DELETE FROM app_scavenger_hunt__hunts WHERE id=?", [id]);
+    submissions = submissions.filter((s) => s.hunt_id !== id);
+    tasks = tasks.filter((t) => t.hunt_id !== id);
+    awards = awards.filter((a) => a.hunt_id !== id);
+  }
   catch (e) { hunts = prev; showError(e.message); }
 }
 
@@ -250,7 +291,12 @@ async function deleteTask(id) {
   const prev = tasks;
   tasks = tasks.filter((t) => t.id !== id);
   render();
-  try { await db("DELETE FROM app_scavenger_hunt__tasks WHERE id=?", [id]); }
+  try {
+    // delete_cascades.tasks reclaims the submissions and their photos; see the
+    // note above deleteHunt for why the client cannot do this itself.
+    await db("DELETE FROM app_scavenger_hunt__tasks WHERE id=?", [id]);
+    submissions = submissions.filter((s) => s.task_id !== id);
+  }
   catch (e) { tasks = prev; showError(e.message); }
 }
 
