@@ -85,6 +85,23 @@
     "awards": { "column": "awarded_by", "on_removed": "keep" }
   },
   "nav": { "label": "Hunt" },
+  "glance": {
+    "source": {
+      "kind": "sql",
+      "query": "SELECT COUNT(*) AS n FROM app_scavenger_hunt__hunts h LEFT JOIN app_scavenger_hunt__submissions s ON s.hunt_id = h.id WHERE h.status = 'open' AND s.id IS NULL LIMIT 1"
+    },
+    "display": {
+      "template": "badge",
+      "count": "n",
+      "label": "hunts waiting for you",
+      "severity": "info"
+    }
+  },
+  "publishes": ["hunt.opened", "hunt.closed"],
+  "publish_acls": {
+    "hunt.opened": { "require_role": "member" },
+    "hunt.closed": { "require_role": "member" }
+  },
   "resource_limits": {
     "max_db_bytes": 52428800
   }

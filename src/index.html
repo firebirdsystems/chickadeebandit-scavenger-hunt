@@ -125,6 +125,20 @@ const CONTEXT = window.__CONTEXT_URL ?? "";
 const DB = window.__DB_URL ?? "";
 const HUB_MEMBER = window.__CURRENT_MEMBER ?? null;
 const files = createFilesHelper(window.__FILES_URL ?? "");
+const EVENTS = window.__EVENTS_URL ?? "";
+
+async function publishEvent(type, subjectId, payload = {}) {
+  if (!EVENTS) return;
+  try {
+    await fetch(EVENTS, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type, subject_id: subjectId, payload }),
+    });
+  } catch {
+    // The status change is already written; a failed publish is not fatal.
+  }
+}
 
 let members = [];
 let memberMap = new Map();
@@ -248,6 +262,15 @@ async function setHuntStatus(id, status) {
   try {
     await db("UPDATE app_scavenger_hunt__hunts SET status=? WHERE id=?", [status, id]);
     if (status === "closed") await refresh(); // sealed submissions just released
+    // Real transitions only — re-saving the same status publishes nothing. No
+    // task, caption or photo travels: opening is an invitation and closing is
+    // the reveal, and both are already household-visible facts.
+    if (status !== prev.status && (status === "open" || status === "closed")) {
+      await publishEvent(status === "open" ? "hunt.opened" : "hunt.closed", id, {
+        title: prev.title,
+        organizer_id: prev.created_by,
+      });
+    }
   } catch (e) { hunts[idx] = prev; showError(e.message); }
 }
 
