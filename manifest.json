@@ -1,16 +1,28 @@
 {
   "id": "scavenger-hunt",
-  "contexts": ["household", "shared_space"],
+  "contexts": [
+    "household",
+    "shared_space"
+  ],
   "name": "Scavenger Hunt",
-  "version": "1.0.0",
-  "description": "Set a list of things to find, everyone hunts and submits photo proof in secret, then the big reveal — see everyone's finds at once and award points.",
+  "version": "1.1.0",
+  "description": "Set a list of things to find, everyone hunts and submits photo proof in secret, then the big reveal \u2014 see everyone's finds at once and award points.",
   "entrypoint": "index.html",
   "runtime": "static",
   "category": "games",
-  "tags": ["scavenger", "hunt", "photos", "game", "family", "party"],
-  "icon": "🔎",
+  "tags": [
+    "scavenger",
+    "hunt",
+    "photos",
+    "game",
+    "family",
+    "party"
+  ],
+  "icon": "\ud83d\udd0e",
   "data_access": {
-    "reads": ["family.members"],
+    "reads": [
+      "family.members"
+    ],
     "writes": []
   },
   "permissions": {
@@ -23,16 +35,28 @@
       "kind": "owner_or_visibility",
       "member_column": "created_by",
       "visibility_column": "visibility",
-      "everyone_values": ["everyone"],
+      "everyone_values": [
+        "everyone"
+      ],
       "write_owner_only": true,
       "retain_days": {
         "default": 365,
         "timestamp_column": "created_at",
         "override_key": "hunt_history",
         "dependent_tables": [
-          { "table": "tasks", "foreign_key": "hunt_id" },
-          { "table": "submissions", "foreign_key": "hunt_id", "file_id_column": "photo_file_id" },
-          { "table": "awards", "foreign_key": "hunt_id" }
+          {
+            "table": "tasks",
+            "foreign_key": "hunt_id"
+          },
+          {
+            "table": "submissions",
+            "foreign_key": "hunt_id",
+            "file_id_column": "photo_file_id"
+          },
+          {
+            "table": "awards",
+            "foreign_key": "hunt_id"
+          }
         ]
       }
     },
@@ -49,15 +73,21 @@
       "parent_table": "hunts",
       "writer_column": "member_id",
       "parent_status_column": "status",
-      "visible_parent_status_values": ["closed"],
+      "visible_parent_status_values": [
+        "closed"
+      ],
       "max_per_member": {
         "member_column": "member_id",
-        "scope_columns": ["task_id"],
+        "scope_columns": [
+          "task_id"
+        ],
         "limit": 1
       },
       "frozen_when": {
         "status_column": "status",
-        "locked_values": ["closed"]
+        "locked_values": [
+          "closed"
+        ]
       }
     },
     "awards": {
@@ -68,23 +98,57 @@
       "insert_only_by_parent_column_member": "created_by"
     }
   },
+  "delete_file_columns": {
+    "submissions": [
+      "photo_file_id"
+    ]
+  },
   "delete_cascades": {
     "hunts": [
-      { "table": "tasks", "foreign_key": "hunt_id" },
-      { "table": "submissions", "foreign_key": "hunt_id", "file_id_column": "photo_file_id" },
-      { "table": "awards", "foreign_key": "hunt_id" }
+      {
+        "table": "tasks",
+        "foreign_key": "hunt_id"
+      },
+      {
+        "table": "submissions",
+        "foreign_key": "hunt_id",
+        "file_id_column": "photo_file_id"
+      },
+      {
+        "table": "awards",
+        "foreign_key": "hunt_id"
+      }
     ],
     "tasks": [
-      { "table": "submissions", "foreign_key": "task_id", "file_id_column": "photo_file_id" }
+      {
+        "table": "submissions",
+        "foreign_key": "task_id",
+        "file_id_column": "photo_file_id"
+      }
     ]
   },
   "member_references": {
-    "hunts": { "column": "created_by", "on_removed": "keep" },
-    "tasks": { "column": "created_by", "on_removed": "keep" },
-    "submissions": { "column": "member_id", "on_removed": "delete", "file_id_column": "photo_file_id" },
-    "awards": { "column": "awarded_by", "on_removed": "keep" }
+    "hunts": {
+      "column": "created_by",
+      "on_removed": "keep"
+    },
+    "tasks": {
+      "column": "created_by",
+      "on_removed": "keep"
+    },
+    "submissions": {
+      "column": "member_id",
+      "on_removed": "delete",
+      "file_id_column": "photo_file_id"
+    },
+    "awards": {
+      "column": "awarded_by",
+      "on_removed": "keep"
+    }
   },
-  "nav": { "label": "Hunt" },
+  "nav": {
+    "label": "Hunt"
+  },
   "glance": {
     "source": {
       "kind": "sql",
@@ -97,10 +161,17 @@
       "severity": "info"
     }
   },
-  "publishes": ["hunt.opened", "hunt.closed"],
+  "publishes": [
+    "hunt.opened",
+    "hunt.closed"
+  ],
   "publish_acls": {
-    "hunt.opened": { "require_role": "member" },
-    "hunt.closed": { "require_role": "member" }
+    "hunt.opened": {
+      "require_role": "member"
+    },
+    "hunt.closed": {
+      "require_role": "member"
+    }
   },
   "resource_limits": {
     "max_db_bytes": 52428800
