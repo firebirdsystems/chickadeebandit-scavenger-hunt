@@ -1,6 +1,6 @@
 {
   "name": "chickadeebandit-scavenger-hunt",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Photo scavenger hunt with sealed submissions app for Chickadee Bandit",
   "type": "module",
   "scripts": {

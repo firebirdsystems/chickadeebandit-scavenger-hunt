@@ -5,7 +5,7 @@
     "shared_space"
   ],
   "name": "Scavenger Hunt",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Set a list of things to find, everyone hunts and submits photo proof in secret, then the big reveal \u2014 see everyone's finds at once and award points.",
   "entrypoint": "index.html",
   "runtime": "static",
@@ -30,6 +30,34 @@
     "requires_approval": false
   },
   "storage": "db",
+  "shareable": {
+    "hunt": {
+      "table": "hunts",
+      "title_column": "title",
+      "owner_column": "created_by",
+      "columns": [
+        { "column": "created_at", "label": "Hunted on", "format": "date" }
+      ],
+      "visible_where": { "column": "status", "values": ["closed"] },
+      "aggregates": [
+        { "label": "Photos", "table": "submissions", "fk_column": "hunt_id", "op": "count" }
+      ],
+      "feed": {
+        "label": "The finds",
+        "table": "submissions",
+        "fk_column": "hunt_id",
+        "columns": [
+          { "column": "caption", "label": "Caption", "role": "body" },
+          { "column": "created_at", "label": "Found", "format": "datetime", "role": "timestamp" }
+        ],
+        "files_column": "photo_file_id",
+        "order_column": "created_at",
+        "order": "oldest",
+        "max_items": 100,
+        "empty_text": "This hunt finished without any photos."
+      }
+    }
+  },
   "row_policies": {
     "hunts": {
       "kind": "owner_or_visibility",

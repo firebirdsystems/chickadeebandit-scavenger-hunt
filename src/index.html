@@ -99,6 +99,13 @@
     .grid2 { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
     label { font-size: .74rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 800; }
     .modal-actions { display: flex; gap: 8px; margin-top: 6px; justify-content: flex-end; }
+    .modal h2 + .muted { margin-bottom: 12px; }
+    .share-row { display: grid; gap: 4px; padding: 10px 0; border-top: 1px solid var(--border); }
+    .share-url { width: 100%; font-size: .8rem; padding: 5px 7px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg, transparent); color: inherit; }
+    .share-row-actions { display: flex; gap: 6px; justify-content: flex-end; }
+    .share-create { display: flex; gap: 8px; align-items: center; margin-top: 14px; flex-wrap: wrap; }
+    .share-create select { padding: 6px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: inherit; font: inherit; font-size: .85rem; }
+    #share-password { width: 100%; margin-top: 10px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: inherit; font: inherit; font-size: .85rem; }
     .search-row { margin-bottom: 12px; }
     .search-input {
       width: 100%; border: 1.5px solid var(--border-mid, var(--border, #d1d5db));
@@ -115,7 +122,7 @@
 </div>
 
 <script type="module">
-import { esc, hubConfirm, hubAlert, createFilesHelper, searchMatch } from "/hub-sdk.js";
+import { esc, hubConfirm, hubAlert, createFilesHelper, createShareHelper, searchMatch } from "/hub-sdk.js";
 import {
   isOrganizer, statusLabel, visibleHunts, huntTasks, submissionFor,
   foundCount, awardBySubmission, scoreboard, searchableFields,
@@ -125,6 +132,7 @@ const CONTEXT = window.__CONTEXT_URL ?? "";
 const DB = window.__DB_URL ?? "";
 const HUB_MEMBER = window.__CURRENT_MEMBER ?? null;
 const files = createFilesHelper(window.__FILES_URL ?? "");
+const share = createShareHelper(window.__SHARE_CREATE_URL, window.__SHARE_REVOKE_URL, window.__SHARE_LIST_URL);
 const EVENTS = window.__EVENTS_URL ?? "";
 
 async function publishEvent(type, subjectId, payload = {}) {
@@ -151,6 +159,8 @@ let awards = [];
 let openHuntId = null;
 let error = "";
 let modalEl = null;
+let shareLinks = [];
+let shareEntitled = false;
 
 function nowIso() { return new Date().toISOString(); }
 function memberName(id) { return memberMap.get(id)?.name ?? "Someone"; }
@@ -469,6 +479,7 @@ function renderHunt(hunt) {
           ${hunt.status === "draft" ? `<button class="btn btn-sm" data-start-hunt>Start the hunt</button>` : ""}
           ${hunt.status === "open" ? `<button class="btn btn-sm" data-close-hunt>End & reveal</button>` : ""}
           ${hunt.status === "draft" ? `<button class="btn btn-ghost btn-sm" data-add-task>+ Thing to find</button>` : ""}
+          ${hunt.status === "closed" && share.enabled ? `<button class="btn btn-ghost btn-sm" data-share>🔗 Share gallery</button>` : ""}
           <button class="btn btn-danger btn-sm" data-delete-hunt>Delete</button>
         </div>` : ""}
     </div>
@@ -567,6 +578,81 @@ function openTaskEditor(huntId) {
   });
 }
 
+/* ── Share gallery ─────────────────────────────────────────────────────────── */
+// A finished hunt's photos on a public, account-free URL. Offered only once the
+// hunt is closed: `shareable.hunt.visible_where` gates the page on status
+// "closed", so a link minted earlier would render nothing anyway — and the
+// reveal is the whole point of the game.
+//
+// Deliberately unattributed. `submissions` carries member_id but no display
+// name, and the feed reads one table, so no name reaches the page — which is
+// the right default for a link that publishes photos of children.
+async function openShareModal(hunt) {
+  const status = await share.status();
+  shareLinks = status.links;
+  shareEntitled = status.entitled;
+  const live = shareLinks.filter((l) =>
+    l.itemId === hunt.id && !l.revokedAt && new Date(l.expiresAt) > new Date());
+
+  const rows = live.map((l) => `
+    <div class="share-row">
+      <input readonly value="${esc(l.url)}" onclick="this.select()" class="share-url" />
+      <div class="muted tiny">
+        Expires ${new Date(l.expiresAt).toLocaleDateString()} · ${l.viewCount} view${l.viewCount === 1 ? "" : "s"}${l.hasPassword ? " · 🔒 password" : ""}
+      </div>
+      <div class="share-row-actions">
+        <button class="btn btn-ghost btn-sm" data-share-copy="${esc(l.id)}">Copy</button>
+        <button class="btn btn-danger btn-sm" data-share-revoke="${esc(l.id)}">Revoke</button>
+      </div>
+    </div>`).join("");
+
+  openModal(`
+    <h2>Share "${esc(hunt.title)}"</h2>
+    <p class="muted tiny">
+      Anyone with the link sees the finished hunt's photos and captions — no account, no names.
+      Links expire on their own, and revoking one cuts off the photos immediately.
+    </p>
+    ${rows || `<p class="muted tiny">No active links yet.</p>`}
+    ${shareEntitled ? `
+      <input id="share-password" type="text" autocomplete="off" placeholder="Optional password (min 4 chars)" />` : ""}
+    <div class="share-create">
+      <select id="share-expiry">
+        <option value="24">1 day</option>
+        <option value="168" selected>7 days</option>
+        <option value="720">30 days</option>
+        ${shareEntitled ? `<option value="8760">1 year</option>` : ""}
+      </select>
+      <button class="btn" data-share-create>Create link</button>
+      <button class="btn btn-ghost" data-cancel>Close</button>
+    </div>
+  `);
+}
+
+async function createShareLink(hunt) {
+  const hours = Number(document.getElementById("share-expiry")?.value) || undefined;
+  const password = document.getElementById("share-password")?.value?.trim() || undefined;
+  const btn = document.querySelector("[data-share-create]");
+  if (btn) { btn.disabled = true; btn.textContent = "Creating…"; }
+  try {
+    const link = await share.create("hunt", hunt.id, { expiresInHours: hours, label: hunt.title, password });
+    try { await navigator.clipboard.writeText(link.url); } catch { /* the re-render shows the url to copy */ }
+    await openShareModal(hunt);
+  } catch (err) {
+    if (btn) { btn.disabled = false; btn.textContent = "Create link"; }
+    hubAlert("Couldn't create share link", { description: err.message });
+  }
+}
+
+async function revokeShareLink(id, hunt) {
+  const ok = await hubConfirm("Revoke this link?", {
+    description: "Anyone using it loses the gallery straight away, photos included.",
+    confirmLabel: "Revoke",
+  });
+  if (!ok) return;
+  try { await share.revoke(id); await openShareModal(hunt); }
+  catch (err) { hubAlert("Couldn't revoke share link", { description: err.message }); }
+}
+
 /* ── Events ────────────────────────────────────────────────────────────────── */
 document.addEventListener("click", (e) => {
   const t = e.target.closest("button");
@@ -586,6 +672,14 @@ document.addEventListener("click", (e) => {
   }
   if (t.hasAttribute("data-close-hunt")) { setHuntStatus(hunt.id, "closed").catch((err) => showError(err.message)); return; }
   if (t.hasAttribute("data-delete-hunt")) { deleteHunt(hunt.id); return; }
+  if (t.hasAttribute("data-share")) { openShareModal(hunt).catch((err) => showError(err.message)); return; }
+  if (t.hasAttribute("data-share-create")) { createShareLink(hunt); return; }
+  if (t.hasAttribute("data-share-revoke")) { revokeShareLink(t.getAttribute("data-share-revoke"), hunt); return; }
+  if (t.hasAttribute("data-share-copy")) {
+    const link = shareLinks.find((l) => l.id === t.getAttribute("data-share-copy"));
+    if (link) navigator.clipboard.writeText(link.url).catch(() => hubAlert("Couldn't copy — select the link text and copy it manually."));
+    return;
+  }
   if (t.hasAttribute("data-award")) {
     const sid = t.getAttribute("data-award");
     const input = document.querySelector(`input[data-award-input="${CSS.escape(sid)}"]`);
