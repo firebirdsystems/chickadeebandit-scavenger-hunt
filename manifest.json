@@ -30,6 +30,9 @@
     "requires_approval": false
   },
   "storage": "db",
+  "preload": {
+    "hunts": {"sql": "SELECT id, title, status, visibility, created_by, created_at FROM app_scavenger_hunt__hunts ORDER BY created_at DESC LIMIT 50"}
+  },
   "shareable": {
     "hunt": {
       "table": "hunts",
