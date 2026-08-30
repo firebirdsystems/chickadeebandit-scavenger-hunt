@@ -1,0 +1,281 @@
+{
+  "scenarios": [
+    {
+      "name": "an open hunt shows a member only their own sealed find, and ending it reveals the rest",
+      "members": {
+        "organizer": "admin",
+        "hunter": "adult"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_scavenger_hunt__hunts (id, title, status, visibility, created_by, created_at) VALUES (?, ?, 'open', 'everyone', ?, datetime('now'))",
+          "params": [
+            "ui-h1",
+            "Backyard Safari",
+            "{{organizer}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, 3, 0, ?, datetime('now'))",
+          "params": [
+            "ui-t1",
+            "ui-h1",
+            "Something older than the house",
+            "{{organizer}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, 1, 1, ?, datetime('now'))",
+          "params": [
+            "ui-t2",
+            "ui-h1",
+            "Something perfectly round",
+            "{{organizer}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, photo_file_id, caption, created_at) VALUES (?, ?, ?, ?, '', ?, datetime('now'))",
+          "params": [
+            "ui-s1a",
+            "ui-h1",
+            "ui-t1",
+            "{{organizer}}",
+            "The stone step by the gate"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, photo_file_id, caption, created_at) VALUES (?, ?, ?, ?, '', ?, datetime('now'))",
+          "params": [
+            "ui-s1b",
+            "ui-h1",
+            "ui-t1",
+            "{{hunter}}",
+            "Grandpa's pocket knife"
+          ]
+        },
+        {
+          "action": "open",
+          "as": "hunter"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"hunt-card\"][data-hunt-id=\"ui-h1\"]",
+          "as": "hunter"
+        },
+        {
+          "action": "click",
+          "selector": "[data-testid=\"hunt-card\"][data-hunt-id=\"ui-h1\"]",
+          "as": "hunter"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"task-card\"][data-task-id=\"ui-t1\"]",
+          "as": "hunter"
+        },
+        {
+          "action": "expectVisible",
+          "selector": "[data-testid=\"task-card\"][data-task-id=\"ui-t1\"][data-mine=\"yes\"]",
+          "as": "hunter"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"find\"]",
+          "count": 0,
+          "as": "hunter"
+        },
+        {
+          "action": "expectVisible",
+          "selector": "[data-testid=\"task-card\"][data-task-id=\"ui-t1\"] [data-testid=\"task-sealed\"]",
+          "as": "hunter"
+        },
+        {
+          "action": "seedRaw",
+          "sql": "UPDATE app_scavenger_hunt__hunts SET status = 'closed' WHERE id = ?",
+          "params": [
+            "ui-h1"
+          ]
+        },
+        {
+          "action": "reload",
+          "as": "hunter"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"hunt-card\"][data-hunt-id=\"ui-h1\"]",
+          "as": "hunter"
+        },
+        {
+          "action": "click",
+          "selector": "[data-testid=\"hunt-card\"][data-hunt-id=\"ui-h1\"]",
+          "as": "hunter"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"task-card\"][data-task-id=\"ui-t1\"]",
+          "as": "hunter"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"find\"]",
+          "count": 2,
+          "as": "hunter"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"find\"][data-mine=\"no\"]",
+          "count": 1,
+          "as": "hunter"
+        },
+        {
+          "action": "expectText",
+          "selector": "[data-testid=\"task-card\"][data-task-id=\"ui-t1\"]",
+          "text": "The stone step by the gate",
+          "as": "hunter"
+        }
+      ]
+    },
+    {
+      "name": "a revealed hunt scores itself for everyone but hands the awarding controls to nobody else",
+      "members": {
+        "organizer": "admin",
+        "hunter": "adult"
+      },
+      "steps": [
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_scavenger_hunt__hunts (id, title, status, visibility, created_by, created_at) VALUES (?, ?, 'closed', 'everyone', ?, datetime('now'))",
+          "params": [
+            "ui-h2",
+            "Rainy Day Hunt",
+            "{{organizer}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, 5, 0, ?, datetime('now'))",
+          "params": [
+            "ui-t3",
+            "ui-h2",
+            "Something that makes a noise",
+            "{{organizer}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, 2, 1, ?, datetime('now'))",
+          "params": [
+            "ui-t4",
+            "ui-h2",
+            "Something blue",
+            "{{organizer}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, photo_file_id, caption, created_at) VALUES (?, ?, ?, ?, '', ?, datetime('now'))",
+          "params": [
+            "ui-s2a",
+            "ui-h2",
+            "ui-t3",
+            "{{hunter}}",
+            "The squeaky floorboard"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, photo_file_id, caption, created_at) VALUES (?, ?, ?, ?, '', ?, datetime('now'))",
+          "params": [
+            "ui-s2b",
+            "ui-h2",
+            "ui-t3",
+            "{{organizer}}",
+            "The kettle"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, photo_file_id, caption, created_at) VALUES (?, ?, ?, ?, '', ?, datetime('now'))",
+          "params": [
+            "ui-s2c",
+            "ui-h2",
+            "ui-t4",
+            "{{hunter}}",
+            "A very blue mug"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, 5, ?, datetime('now'))",
+          "params": [
+            "ui-w1",
+            "ui-h2",
+            "ui-s2a",
+            "{{organizer}}"
+          ]
+        },
+        {
+          "action": "seedRaw",
+          "sql": "INSERT INTO app_scavenger_hunt__hunts (id, title, status, visibility, created_by, created_at) VALUES (?, ?, 'draft', 'everyone', ?, datetime('now'))",
+          "params": [
+            "ui-h3",
+            "Unfinished Hunt",
+            "{{organizer}}"
+          ]
+        },
+        {
+          "action": "open",
+          "as": "hunter"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"hunt-card\"][data-hunt-id=\"ui-h2\"]",
+          "as": "hunter"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"hunt-card\"][data-hunt-id=\"ui-h3\"]",
+          "count": 0,
+          "as": "hunter"
+        },
+        {
+          "action": "click",
+          "selector": "[data-testid=\"hunt-card\"][data-hunt-id=\"ui-h2\"]",
+          "as": "hunter"
+        },
+        {
+          "action": "waitFor",
+          "selector": "[data-testid=\"task-card\"][data-task-id=\"ui-t3\"]",
+          "as": "hunter"
+        },
+        {
+          "action": "expectVisible",
+          "selector": "[data-testid=\"score-row\"][data-points=\"5\"]",
+          "as": "hunter"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"award-btn\"]",
+          "count": 0,
+          "as": "hunter"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"find\"]",
+          "count": 3,
+          "as": "hunter"
+        },
+        {
+          "action": "expectCount",
+          "selector": "[data-testid=\"score-row\"]",
+          "count": 1,
+          "as": "hunter"
+        }
+      ]
+    }
+  ]
+}

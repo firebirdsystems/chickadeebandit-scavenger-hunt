@@ -410,7 +410,7 @@ function renderHuntList() {
     ${list.length ? `<div class="stack">${list.map((h) => {
       const count = huntTasks(tasks, h.id).length;
       return `
-      <button class="hunt-card" data-open="${esc(h.id)}">
+      <button class="hunt-card" data-testid="hunt-card" data-hunt-id="${esc(h.id)}" data-open="${esc(h.id)}">
         <div class="hunt-body">
           <div class="hunt-title">${esc(h.title)}</div>
           <div class="hunt-meta">By ${esc(memberName(h.created_by))} · ${count} thing${count === 1 ? "" : "s"} to find</div>
@@ -425,7 +425,7 @@ function renderFind(hunt, s, organizer) {
   const awardMap = awardBySubmission(awards, hunt.id);
   const award = awardMap.get(s.id);
   return `
-    <div class="find">
+    <div class="find" data-testid="find" data-submission-id="${esc(s.id)}" data-mine="${s.member_id === me?.id ? "yes" : "no"}">
       ${s.photo_file_id ? `<img src="${esc(files.url(s.photo_file_id))}" alt="Find by ${esc(memberName(s.member_id))}" loading="lazy" />` : ""}
       <div class="find-meta">
         <span class="who">${esc(memberName(s.member_id))}</span>
@@ -434,7 +434,7 @@ function renderFind(hunt, s, organizer) {
         ${organizer && hunt.status === "closed" ? `
           <div class="award-row">
             <input type="number" min="0" max="99" value="${award ? esc(String(Number(award.points_awarded))) : ""}" data-award-input="${esc(s.id)}" placeholder="pts" />
-            <button class="btn btn-ghost btn-sm" data-award="${esc(s.id)}">Award</button>
+            <button class="btn btn-ghost btn-sm" data-testid="award-btn" data-submission-id="${esc(s.id)}" data-award="${esc(s.id)}">Award</button>
           </div>` : ""}
       </div>
     </div>`;
@@ -444,12 +444,12 @@ function renderTask(hunt, task, organizer) {
   const mine = submissionFor(submissions, task.id, me?.id);
   const taskSubs = submissions.filter((s) => s.task_id === task.id);
   return `
-    <div class="task-card">
+    <div class="task-card" data-testid="task-card" data-task-id="${esc(task.id)}" data-mine="${mine ? "yes" : "no"}">
       <div class="task-points">${esc(String(Number(task.points) || 1))} pt${Number(task.points) === 1 ? "" : "s"}</div>
       <div class="task-title">${esc(task.title)}</div>
       ${organizer && hunt.status === "draft" ? `<div class="sealed"><button class="btn btn-ghost btn-sm" data-delete-task="${esc(task.id)}">Remove</button></div>` : ""}
       ${hunt.status === "open" ? (mine
-        ? `<div class="sealed">🔒 Your find is in${mine.caption ? `: <strong>${esc(mine.caption)}</strong>` : ""}. Sealed until the reveal.</div>`
+        ? `<div class="sealed" data-testid="task-sealed">🔒 Your find is in${mine.caption ? `: <strong>${esc(mine.caption)}</strong>` : ""}. Sealed until the reveal.</div>`
         : `
           <form class="submit-row" data-find-form="${esc(task.id)}">
             ${window.__FILES_URL ? `<input type="file" accept="image/*" capture="environment" />` : ""}
@@ -486,9 +486,9 @@ function renderHunt(hunt) {
     ${error ? `<div class="error">${esc(error)}</div>` : ""}
     ${hunt.status === "closed" && scores.length ? `
       <div class="section-head"><h2>🏆 Scoreboard</h2></div>
-      <div class="stack" style="margin-bottom:14px">
+      <div class="stack" data-testid="scoreboard" style="margin-bottom:14px">
         ${scores.map((s, i) => `
-          <div class="score-row">
+          <div class="score-row" data-testid="score-row" data-points="${esc(String(s.points))}">
             <span class="score-rank">${i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}</span>
             <span class="score-name">${esc(memberName(s.member_id))}</span>
             <span class="score-pts">${s.points} pts · ${s.finds} finds</span>
