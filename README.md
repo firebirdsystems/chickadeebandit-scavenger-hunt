@@ -1,5 +1,7 @@
 # Scavenger Hunt
 
+A [Chickadee Bandit](https://chickadeebandit.com/app-library/scavenger-hunt) app.
+
 Set a list of things to find, everyone hunts and submits photo proof in
 secret, then the big reveal — see everyone's finds at once and award points.
 
