@@ -122,7 +122,7 @@
 </div>
 
 <script type="module">
-import { esc, hubConfirm, hubAlert, createFilesHelper, createShareHelper, searchMatch } from "/hub-sdk.js";
+import { esc, hubConfirm, hubAlert, createFilesHelper, createShareHelper, searchMatch, activeShareLinks, SHARE_EXPIRY_CHOICES, DEFAULT_SHARE_EXPIRY_HOURS } from "/hub-sdk.js";
 import {
   isOrganizer, statusLabel, visibleHunts, huntTasks, submissionFor,
   foundCount, awardBySubmission, scoreboard, searchableFields,
@@ -588,11 +588,10 @@ function openTaskEditor(huntId) {
 // name, and the feed reads one table, so no name reaches the page — which is
 // the right default for a link that publishes photos of children.
 async function openShareModal(hunt) {
-  const status = await share.status();
+  const status = await share.listAll();
   shareLinks = status.links;
   shareEntitled = status.entitled;
-  const live = shareLinks.filter((l) =>
-    l.itemId === hunt.id && !l.revokedAt && new Date(l.expiresAt) > new Date());
+  const live = activeShareLinks(shareLinks, hunt.id);
 
   const rows = live.map((l) => `
     <div class="share-row">
@@ -617,9 +616,8 @@ async function openShareModal(hunt) {
       <input id="share-password" type="text" autocomplete="off" placeholder="Optional password (min 4 chars)" />` : ""}
     <div class="share-create">
       <select id="share-expiry">
-        <option value="24">1 day</option>
-        <option value="168" selected>7 days</option>
-        <option value="720">30 days</option>
+        ${SHARE_EXPIRY_CHOICES.map(({ hours, label }) =>
+              `<option value="${hours}"${hours === DEFAULT_SHARE_EXPIRY_HOURS ? " selected" : ""}>${label}</option>`).join("")}
         ${shareEntitled ? `<option value="8760">1 year</option>` : ""}
       </select>
       <button class="btn" data-share-create>Create link</button>
