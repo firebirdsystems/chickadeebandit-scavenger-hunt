@@ -45,20 +45,34 @@
       "aggregates": [
         { "label": "Photos", "table": "submissions", "fk_column": "hunt_id", "op": "count" }
       ],
-      "feed": {
-        "label": "The finds",
-        "table": "submissions",
-        "fk_column": "hunt_id",
-        "columns": [
-          { "column": "caption", "label": "Caption", "role": "body" },
-          { "column": "created_at", "label": "Found", "format": "datetime", "role": "timestamp" }
-        ],
-        "files_column": "photo_file_id",
-        "order_column": "created_at",
-        "order": "oldest",
-        "max_items": 100,
-        "empty_text": "This hunt finished without any photos."
-      }
+      "feeds": [
+        {
+          "label": "The list",
+          "table": "tasks",
+          "fk_column": "hunt_id",
+          "columns": [
+            { "column": "title", "label": "Find", "role": "heading" },
+            { "column": "points", "label": "Points", "format": "number", "role": "detail" }
+          ],
+          "order_column": "sort_order",
+          "order": "oldest",
+          "max_items": 100
+        },
+        {
+          "label": "The finds",
+          "table": "submissions",
+          "fk_column": "hunt_id",
+          "columns": [
+            { "column": "caption", "label": "Caption", "role": "body" },
+            { "column": "created_at", "label": "Found", "format": "datetime", "role": "timestamp" }
+          ],
+          "files_column": "photo_file_id",
+          "order_column": "created_at",
+          "order": "oldest",
+          "max_items": 100,
+          "empty_text": "This hunt finished without any photos."
+        }
+      ]
     }
   },
   "row_policies": {

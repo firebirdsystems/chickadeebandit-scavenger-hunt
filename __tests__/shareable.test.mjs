@@ -48,7 +48,7 @@ function columnsOf(table) {
 }
 
 const item = manifest.shareable.hunt;
-const feed = item.feed;
+const [list, feed] = item.feeds ?? [];
 
 describe("shareable.hunt", () => {
   it("shares hunts, keyed on the organizer", () => {
@@ -74,6 +74,10 @@ describe("shareable.hunt", () => {
     // so this holds as long as nobody projects member_id.
     const projected = feed.columns.map((c) => c.column);
     expect(projected).not.toContain("member_id");
+    for (const f of item.feeds) {
+      expect(f.columns.map((c) => c.column)).not.toContain("member_id");
+      expect(f.columns.map((c) => c.column)).not.toContain("created_by");
+    }
     expect(projected.every((c) => columnsOf("submissions").includes(c))).toBe(true);
     expect(JSON.stringify(item.columns)).not.toContain("created_by");
   });
@@ -98,8 +102,36 @@ describe("shareable.hunt", () => {
   });
 
   it("declares no filter it cannot enforce", () => {
-    for (const filter of feed.where ?? []) expect(isPlaintext(filter.column)).toBe(true);
-    if (feed.parent_where) expect(isPlaintext(feed.parent_where.column)).toBe(true);
+    for (const f of item.feeds) {
+      for (const filter of f.where ?? []) expect(isPlaintext(filter.column)).toBe(true);
+      if (f.parent_where) expect(isPlaintext(f.parent_where.column)).toBe(true);
+    }
+  });
+
+  it("shows what people were hunting for, then what they found", () => {
+    // A page of photos and captions alone does not say what anyone was
+    // looking for, so the list comes first.
+    expect(item.feed).toBeUndefined();
+    expect(item.feeds.map((f) => [f.label, f.table, f.fk_column])).toEqual([
+      ["The list", "tasks", "hunt_id"],
+      ["The finds", "submissions", "hunt_id"],
+    ]);
+  });
+
+  it("shows each task's title and points, and nothing else", () => {
+    // tasks.created_by is the organizer; like member_id it stays off the page.
+    expect(list.columns.map((c) => [c.column, c.role])).toEqual([["title", "heading"], ["points", "detail"]]);
+    expect(list.columns.every((c) => columnsOf("tasks").includes(c.column))).toBe(true);
+    expect(list.files_column).toBeUndefined();
+  });
+
+  it("orders the list the way the app plays it", () => {
+    expect(list.order_column).toBe("sort_order");
+    expect(list.order).toBe("oldest");
+    expect(columnsOf("tasks")).toContain(list.order_column);
+    expect(isPlaintext(list.order_column)).toBe(true);
+    // The hub requires an index leading with each feed's fk_column.
+    expect(schema).toMatch(/ON app_scavenger_hunt__tasks \(hunt_id, sort_order\)/);
   });
 
   it("accepts no submissions — this link is read-only", () => {
