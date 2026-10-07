@@ -122,7 +122,7 @@
 </div>
 
 <script type="module">
-import { esc, hubConfirm, hubAlert, createFilesHelper, createShareHelper, searchMatch, activeShareLinks, SHARE_EXPIRY_CHOICES, DEFAULT_SHARE_EXPIRY_HOURS } from "/hub-sdk.js";
+import { esc, hubConfirm, hubAlert, createFilesHelper, createShareHelper, searchMatch, glyph, chickadee, activeShareLinks, SHARE_EXPIRY_CHOICES, DEFAULT_SHARE_EXPIRY_HOURS } from "/hub-sdk.js";
 import {
   isOrganizer, statusLabel, visibleHunts, huntTasks, submissionFor,
   foundCount, awardBySubmission, scoreboard, searchableFields,
@@ -400,7 +400,7 @@ function renderHuntList() {
   return `
     <div class="topbar">
       <div>
-        <h1>🔎 Scavenger Hunt</h1>
+        <h1>${glyph("magnifier")} Scavenger Hunt</h1>
         <p class="muted tiny">Everyone hunts in secret. Photos reveal all at once.</p>
       </div>
       <button class="btn" data-new-hunt>+ New hunt</button>
@@ -417,7 +417,7 @@ function renderHuntList() {
         </div>
         <span class="pill ${esc(h.status)}">${esc(statusLabel(h.status))}</span>
       </button>`;
-    }).join("")}</div>` : `<div class="card empty">${searchQ ? `No hunts match "${esc(searchQ)}".` : "No hunts yet — set one up!"}</div>`}
+    }).join("")}</div>` : `<div class="card empty"><div>${chickadee(searchQ ? "searching" : "nest", { size: 72 })}</div>${searchQ ? `No hunts match "${esc(searchQ)}".` : "No hunts yet — set one up!"}</div>`}
   `;
 }
 
@@ -430,7 +430,7 @@ function renderFind(hunt, s, organizer) {
       <div class="find-meta">
         <span class="who">${esc(memberName(s.member_id))}</span>
         ${s.caption ? ` — ${esc(s.caption)}` : ""}
-        ${award ? `<div>🏅 ${esc(String(Number(award.points_awarded)))} pts</div>` : ""}
+        ${award ? `<div>${glyph("medal")} ${esc(String(Number(award.points_awarded)))} pts</div>` : ""}
         ${organizer && hunt.status === "closed" ? `
           <div class="award-row">
             <input type="number" min="0" max="99" value="${award ? esc(String(Number(award.points_awarded))) : ""}" data-award-input="${esc(s.id)}" placeholder="pts" />
@@ -449,7 +449,7 @@ function renderTask(hunt, task, organizer) {
       <div class="task-title">${esc(task.title)}</div>
       ${organizer && hunt.status === "draft" ? `<div class="sealed"><button class="btn btn-ghost btn-sm" data-delete-task="${esc(task.id)}">Remove</button></div>` : ""}
       ${hunt.status === "open" ? (mine
-        ? `<div class="sealed" data-testid="task-sealed">🔒 Your find is in${mine.caption ? `: <strong>${esc(mine.caption)}</strong>` : ""}. Sealed until the reveal.</div>`
+        ? `<div class="sealed" data-testid="task-sealed">${glyph("lock")} Your find is in${mine.caption ? `: <strong>${esc(mine.caption)}</strong>` : ""}. Sealed until the reveal.</div>`
         : `
           <form class="submit-row" data-find-form="${esc(task.id)}">
             ${window.__FILES_URL ? `<input type="file" accept="image/*" capture="environment" />` : ""}
@@ -479,13 +479,13 @@ function renderHunt(hunt) {
           ${hunt.status === "draft" ? `<button class="btn btn-sm" data-start-hunt>Start the hunt</button>` : ""}
           ${hunt.status === "open" ? `<button class="btn btn-sm" data-close-hunt>End & reveal</button>` : ""}
           ${hunt.status === "draft" ? `<button class="btn btn-ghost btn-sm" data-add-task>+ Thing to find</button>` : ""}
-          ${hunt.status === "closed" && share.enabled ? `<button class="btn btn-ghost btn-sm" data-share>🔗 Share gallery</button>` : ""}
+          ${hunt.status === "closed" && share.enabled ? `<button class="btn btn-ghost btn-sm" data-share>${glyph("link")} Share gallery</button>` : ""}
           <button class="btn btn-danger btn-sm" data-delete-hunt>Delete</button>
         </div>` : ""}
     </div>
     ${error ? `<div class="error">${esc(error)}</div>` : ""}
     ${hunt.status === "closed" && scores.length ? `
-      <div class="section-head"><h2>🏆 Scoreboard</h2></div>
+      <div class="section-head"><h2>${glyph("trophy")} Scoreboard</h2></div>
       <div class="stack" data-testid="scoreboard" style="margin-bottom:14px">
         ${scores.map((s, i) => `
           <div class="score-row" data-testid="score-row" data-points="${esc(String(s.points))}">
@@ -496,7 +496,7 @@ function renderHunt(hunt) {
       </div>` : ""}
     ${ts.length
       ? `<div class="stack">${ts.map((t) => renderTask(hunt, t, organizer)).join("")}</div>`
-      : `<div class="card empty tiny">${organizer ? "Add things to find, then start the hunt." : "The organizer is still building the list."}</div>`}
+      : `<div class="card empty tiny"><div>${chickadee(organizer ? "nest" : "waiting", { size: 72 })}</div>${organizer ? "Add things to find, then start the hunt." : "The organizer is still building the list."}</div>`}
   `;
 }
 
@@ -597,7 +597,7 @@ async function openShareModal(hunt) {
     <div class="share-row">
       <input readonly value="${esc(l.url)}" onclick="this.select()" class="share-url" />
       <div class="muted tiny">
-        Expires ${new Date(l.expiresAt).toLocaleDateString()} · ${l.viewCount} view${l.viewCount === 1 ? "" : "s"}${l.hasPassword ? " · 🔒 password" : ""}
+        Expires ${new Date(l.expiresAt).toLocaleDateString()} · ${l.viewCount} view${l.viewCount === 1 ? "" : "s"}${l.hasPassword ? ` · ${glyph("lock")} password` : ""}
       </div>
       <div class="share-row-actions">
         <button class="btn btn-ghost btn-sm" data-share-copy="${esc(l.id)}">Copy</button>
