@@ -1,0 +1,2003 @@
+{
+ "seed": [
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__hunts (id, title, status, visibility, created_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-0.5 days','+0 minutes'))",
+   "params": [
+    "perf-hunt-1",
+    "Christmas market hunt",
+    "draft",
+    "everyone",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-0.5 days','+5 minutes'))",
+   "params": [
+    "perf-hunt-1-t1",
+    "perf-hunt-1",
+    "Something that smells of cinnamon",
+    1,
+    0,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-0.5 days','+6 minutes'))",
+   "params": [
+    "perf-hunt-1-t2",
+    "perf-hunt-1",
+    "The tallest tree",
+    2,
+    1,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-0.5 days','+7 minutes'))",
+   "params": [
+    "perf-hunt-1-t3",
+    "perf-hunt-1",
+    "A hand-knitted hat",
+    1,
+    2,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-0.5 days','+8 minutes'))",
+   "params": [
+    "perf-hunt-1-t4",
+    "perf-hunt-1",
+    "Someone dressed as an elf",
+    3,
+    3,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-0.5 days','+9 minutes'))",
+   "params": [
+    "perf-hunt-1-t5",
+    "perf-hunt-1",
+    "A wooden toy",
+    1,
+    4,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-0.5 days','+10 minutes'))",
+   "params": [
+    "perf-hunt-1-t6",
+    "perf-hunt-1",
+    "The best hot chocolate",
+    2,
+    5,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__hunts (id, title, status, visibility, created_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 days','+0 minutes'))",
+   "params": [
+    "perf-hunt-2",
+    "Backyard Safari",
+    "open",
+    "everyone",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 days','+5 minutes'))",
+   "params": [
+    "perf-hunt-2-t1",
+    "perf-hunt-2",
+    "Something older than the house",
+    3,
+    0,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 days','+6 minutes'))",
+   "params": [
+    "perf-hunt-2-t2",
+    "perf-hunt-2",
+    "Something perfectly round",
+    1,
+    1,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 days','+7 minutes'))",
+   "params": [
+    "perf-hunt-2-t3",
+    "perf-hunt-2",
+    "A bug (photo only, be kind)",
+    1,
+    2,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 days','+8 minutes'))",
+   "params": [
+    "perf-hunt-2-t4",
+    "perf-hunt-2",
+    "A leaf bigger than your hand",
+    1,
+    3,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 days','+9 minutes'))",
+   "params": [
+    "perf-hunt-2-t5",
+    "perf-hunt-2",
+    "Something that should not be outside",
+    2,
+    4,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-2 days','+10 minutes'))",
+   "params": [
+    "perf-hunt-2-t6",
+    "perf-hunt-2",
+    "A feather",
+    2,
+    5,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1.6 days','+20 minutes'))",
+   "params": [
+    "perf-hunt-2-t1-m1",
+    "perf-hunt-2",
+    "perf-hunt-2-t1",
+    "{{me}}",
+    "Grandpa's pocket knife"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1.6 days','+29 minutes'))",
+   "params": [
+    "perf-hunt-2-t1-m4",
+    "perf-hunt-2",
+    "perf-hunt-2-t1",
+    "{{child}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1.4000000000000001 days','+32 minutes'))",
+   "params": [
+    "perf-hunt-2-t2-m1",
+    "perf-hunt-2",
+    "perf-hunt-2-t2",
+    "{{me}}",
+    "Took three tries to get the photo"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1.4000000000000001 days','+38 minutes'))",
+   "params": [
+    "perf-hunt-2-t2-m3",
+    "perf-hunt-2",
+    "perf-hunt-2-t2",
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1.2000000000000002 days','+47 minutes'))",
+   "params": [
+    "perf-hunt-2-t3-m2",
+    "perf-hunt-2",
+    "perf-hunt-2-t3",
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','+56 minutes'))",
+   "params": [
+    "perf-hunt-2-t4-m1",
+    "perf-hunt-2",
+    "perf-hunt-2-t4",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-1 days','+68 minutes'))",
+   "params": [
+    "perf-hunt-2-t4-m5",
+    "perf-hunt-2",
+    "perf-hunt-2-t4",
+    "{{child2}}",
+    "Found it under the bench"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-0.8 days','+68 minutes'))",
+   "params": [
+    "perf-hunt-2-t5-m1",
+    "perf-hunt-2",
+    "perf-hunt-2-t5",
+    "{{me}}",
+    "Best one of the day"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-0.8 days','+77 minutes'))",
+   "params": [
+    "perf-hunt-2-t5-m4",
+    "perf-hunt-2",
+    "perf-hunt-2-t5",
+    "{{child}}",
+    "The stone step by the gate"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-0.6000000000000001 days','+86 minutes'))",
+   "params": [
+    "perf-hunt-2-t6-m3",
+    "perf-hunt-2",
+    "perf-hunt-2-t6",
+    "{{adult2}}",
+    "It was hiding in plain sight"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__hunts (id, title, status, visibility, created_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-5 days','+0 minutes'))",
+   "params": [
+    "perf-hunt-3",
+    "Rainy day indoor hunt",
+    "open",
+    "everyone",
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-5 days','+5 minutes'))",
+   "params": [
+    "perf-hunt-3-t1",
+    "perf-hunt-3",
+    "Something with exactly four legs",
+    1,
+    0,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-5 days','+6 minutes'))",
+   "params": [
+    "perf-hunt-3-t2",
+    "perf-hunt-3",
+    "A book with a red cover",
+    1,
+    1,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-5 days','+7 minutes'))",
+   "params": [
+    "perf-hunt-3-t3",
+    "perf-hunt-3",
+    "The oldest coin in the house",
+    3,
+    2,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-5 days','+8 minutes'))",
+   "params": [
+    "perf-hunt-3-t4",
+    "perf-hunt-3",
+    "Something that makes music",
+    1,
+    3,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-5 days','+9 minutes'))",
+   "params": [
+    "perf-hunt-3-t5",
+    "perf-hunt-3",
+    "A sock with no partner",
+    1,
+    4,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-5 days','+10 minutes'))",
+   "params": [
+    "perf-hunt-3-t6",
+    "perf-hunt-3",
+    "Something from another country",
+    2,
+    5,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-4.6 days','+20 minutes'))",
+   "params": [
+    "perf-hunt-3-t1-m1",
+    "perf-hunt-3",
+    "perf-hunt-3-t1",
+    "{{me}}",
+    "Found it under the bench"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-4.6 days','+26 minutes'))",
+   "params": [
+    "perf-hunt-3-t1-m3",
+    "perf-hunt-3",
+    "perf-hunt-3-t1",
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-4.3999999999999995 days','+32 minutes'))",
+   "params": [
+    "perf-hunt-3-t2-m1",
+    "perf-hunt-3",
+    "perf-hunt-3-t2",
+    "{{me}}",
+    "Behind the shed"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-4.3999999999999995 days','+35 minutes'))",
+   "params": [
+    "perf-hunt-3-t2-m2",
+    "perf-hunt-3",
+    "perf-hunt-3-t2",
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-4.199999999999999 days','+56 minutes'))",
+   "params": [
+    "perf-hunt-3-t3-m5",
+    "perf-hunt-3",
+    "perf-hunt-3-t3",
+    "{{child2}}",
+    "The stone step by the gate"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-3.9999999999999996 days','+56 minutes'))",
+   "params": [
+    "perf-hunt-3-t4-m1",
+    "perf-hunt-3",
+    "perf-hunt-3-t4",
+    "{{me}}",
+    "Right at the top"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-3.9999999999999996 days','+65 minutes'))",
+   "params": [
+    "perf-hunt-3-t4-m4",
+    "perf-hunt-3",
+    "perf-hunt-3-t4",
+    "{{child}}",
+    "It was hiding in plain sight"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-3.8 days','+68 minutes'))",
+   "params": [
+    "perf-hunt-3-t5-m1",
+    "perf-hunt-3",
+    "perf-hunt-3-t5",
+    "{{me}}",
+    "The stone step by the gate"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-3.8 days','+74 minutes'))",
+   "params": [
+    "perf-hunt-3-t5-m3",
+    "perf-hunt-3",
+    "perf-hunt-3-t5",
+    "{{adult2}}",
+    "Mia says hers is better"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-3.5999999999999996 days','+83 minutes'))",
+   "params": [
+    "perf-hunt-3-t6-m2",
+    "perf-hunt-3",
+    "perf-hunt-3-t6",
+    "{{partner}}",
+    "Does this count?"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__hunts (id, title, status, visibility, created_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-24 days','+0 minutes'))",
+   "params": [
+    "perf-hunt-4",
+    "Beach day hunt",
+    "closed",
+    "everyone",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-24 days','+5 minutes'))",
+   "params": [
+    "perf-hunt-4-t1",
+    "perf-hunt-4",
+    "A shell with a hole in it",
+    1,
+    0,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-24 days','+6 minutes'))",
+   "params": [
+    "perf-hunt-4-t2",
+    "perf-hunt-4",
+    "Seaweed shaped like a letter",
+    2,
+    1,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-24 days','+7 minutes'))",
+   "params": [
+    "perf-hunt-4-t3",
+    "perf-hunt-4",
+    "A crab (do not pick it up)",
+    3,
+    2,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-24 days','+8 minutes'))",
+   "params": [
+    "perf-hunt-4-t4",
+    "perf-hunt-4",
+    "The smoothest pebble",
+    1,
+    3,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-24 days','+9 minutes'))",
+   "params": [
+    "perf-hunt-4-t5",
+    "perf-hunt-4",
+    "A sandcastle with a moat",
+    2,
+    4,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-24 days','+10 minutes'))",
+   "params": [
+    "perf-hunt-4-t6",
+    "perf-hunt-4",
+    "Something blue that is not the sea",
+    1,
+    5,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.9 days','+23 minutes'))",
+   "params": [
+    "perf-hunt-4-t1-m2",
+    "perf-hunt-4",
+    "perf-hunt-4-t1",
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.5 days','+1 minutes'))",
+   "params": [
+    "perf-hunt-4-t1-m2-aw",
+    "perf-hunt-4",
+    "perf-hunt-4-t1-m2",
+    1,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.9 days','+26 minutes'))",
+   "params": [
+    "perf-hunt-4-t1-m3",
+    "perf-hunt-4",
+    "perf-hunt-4-t1",
+    "{{adult2}}",
+    "Best one of the day"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.5 days','+2 minutes'))",
+   "params": [
+    "perf-hunt-4-t1-m3-aw",
+    "perf-hunt-4",
+    "perf-hunt-4-t1-m3",
+    1,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.9 days','+32 minutes'))",
+   "params": [
+    "perf-hunt-4-t1-m5",
+    "perf-hunt-4",
+    "perf-hunt-4-t1",
+    "{{child2}}",
+    "The one by the cafe"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.5 days','+4 minutes'))",
+   "params": [
+    "perf-hunt-4-t1-m5-aw",
+    "perf-hunt-4",
+    "perf-hunt-4-t1-m5",
+    1,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.9 days','+35 minutes'))",
+   "params": [
+    "perf-hunt-4-t2-m2",
+    "perf-hunt-4",
+    "perf-hunt-4-t2",
+    "{{partner}}",
+    "Right at the top"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.5 days','+3 minutes'))",
+   "params": [
+    "perf-hunt-4-t2-m2-aw",
+    "perf-hunt-4",
+    "perf-hunt-4-t2-m2",
+    2,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.9 days','+41 minutes'))",
+   "params": [
+    "perf-hunt-4-t2-m4",
+    "perf-hunt-4",
+    "perf-hunt-4-t2",
+    "{{child}}",
+    "Nearly missed it"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.5 days','+5 minutes'))",
+   "params": [
+    "perf-hunt-4-t2-m4-aw",
+    "perf-hunt-4",
+    "perf-hunt-4-t2-m4",
+    2,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.9 days','+44 minutes'))",
+   "params": [
+    "perf-hunt-4-t2-m5",
+    "perf-hunt-4",
+    "perf-hunt-4-t2",
+    "{{child2}}",
+    "It was hiding in plain sight"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.9 days','+44 minutes'))",
+   "params": [
+    "perf-hunt-4-t3-m1",
+    "perf-hunt-4",
+    "perf-hunt-4-t3",
+    "{{me}}",
+    "The one by the cafe"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.5 days','+4 minutes'))",
+   "params": [
+    "perf-hunt-4-t3-m1-aw",
+    "perf-hunt-4",
+    "perf-hunt-4-t3-m1",
+    3,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.9 days','+47 minutes'))",
+   "params": [
+    "perf-hunt-4-t3-m2",
+    "perf-hunt-4",
+    "perf-hunt-4-t3",
+    "{{partner}}",
+    "The stone step by the gate"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.5 days','+5 minutes'))",
+   "params": [
+    "perf-hunt-4-t3-m2-aw",
+    "perf-hunt-4",
+    "perf-hunt-4-t3-m2",
+    0,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.9 days','+53 minutes'))",
+   "params": [
+    "perf-hunt-4-t3-m4",
+    "perf-hunt-4",
+    "perf-hunt-4-t3",
+    "{{child}}",
+    "Mia says hers is better"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.9 days','+56 minutes'))",
+   "params": [
+    "perf-hunt-4-t4-m1",
+    "perf-hunt-4",
+    "perf-hunt-4-t4",
+    "{{me}}",
+    "It was hiding in plain sight"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.5 days','+6 minutes'))",
+   "params": [
+    "perf-hunt-4-t4-m1-aw",
+    "perf-hunt-4",
+    "perf-hunt-4-t4-m1",
+    0,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.9 days','+62 minutes'))",
+   "params": [
+    "perf-hunt-4-t4-m3",
+    "perf-hunt-4",
+    "perf-hunt-4-t4",
+    "{{adult2}}",
+    "Does this count?"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.9 days','+65 minutes'))",
+   "params": [
+    "perf-hunt-4-t4-m4",
+    "perf-hunt-4",
+    "perf-hunt-4-t4",
+    "{{child}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.5 days','+9 minutes'))",
+   "params": [
+    "perf-hunt-4-t4-m4-aw",
+    "perf-hunt-4",
+    "perf-hunt-4-t4-m4",
+    1,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.9 days','+68 minutes'))",
+   "params": [
+    "perf-hunt-4-t5-m1",
+    "perf-hunt-4",
+    "perf-hunt-4-t5",
+    "{{me}}",
+    "Grandpa's pocket knife"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.5 days','+8 minutes'))",
+   "params": [
+    "perf-hunt-4-t5-m1-aw",
+    "perf-hunt-4",
+    "perf-hunt-4-t5-m1",
+    2,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.9 days','+74 minutes'))",
+   "params": [
+    "perf-hunt-4-t5-m3",
+    "perf-hunt-4",
+    "perf-hunt-4-t5",
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.5 days','+10 minutes'))",
+   "params": [
+    "perf-hunt-4-t5-m3-aw",
+    "perf-hunt-4",
+    "perf-hunt-4-t5-m3",
+    2,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.9 days','+80 minutes'))",
+   "params": [
+    "perf-hunt-4-t5-m5",
+    "perf-hunt-4",
+    "perf-hunt-4-t5",
+    "{{child2}}",
+    "Nearly missed it"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.5 days','+12 minutes'))",
+   "params": [
+    "perf-hunt-4-t5-m5-aw",
+    "perf-hunt-4",
+    "perf-hunt-4-t5-m5",
+    2,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.9 days','+83 minutes'))",
+   "params": [
+    "perf-hunt-4-t6-m2",
+    "perf-hunt-4",
+    "perf-hunt-4-t6",
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.5 days','+11 minutes'))",
+   "params": [
+    "perf-hunt-4-t6-m2-aw",
+    "perf-hunt-4",
+    "perf-hunt-4-t6-m2",
+    1,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.9 days','+86 minutes'))",
+   "params": [
+    "perf-hunt-4-t6-m3",
+    "perf-hunt-4",
+    "perf-hunt-4-t6",
+    "{{adult2}}",
+    "The stone step by the gate"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.5 days','+12 minutes'))",
+   "params": [
+    "perf-hunt-4-t6-m3-aw",
+    "perf-hunt-4",
+    "perf-hunt-4-t6-m3",
+    1,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.9 days','+92 minutes'))",
+   "params": [
+    "perf-hunt-4-t6-m5",
+    "perf-hunt-4",
+    "perf-hunt-4-t6",
+    "{{child2}}",
+    "Mia says hers is better"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-23.5 days','+14 minutes'))",
+   "params": [
+    "perf-hunt-4-t6-m5-aw",
+    "perf-hunt-4",
+    "perf-hunt-4-t6-m5",
+    1,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__hunts (id, title, status, visibility, created_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-45 days','+0 minutes'))",
+   "params": [
+    "perf-hunt-5",
+    "Neighbourhood walk",
+    "closed",
+    "everyone",
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-45 days','+5 minutes'))",
+   "params": [
+    "perf-hunt-5-t1",
+    "perf-hunt-5",
+    "A red front door",
+    1,
+    0,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-45 days','+6 minutes'))",
+   "params": [
+    "perf-hunt-5-t2",
+    "perf-hunt-5",
+    "A cat in a window",
+    2,
+    1,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-45 days','+7 minutes'))",
+   "params": [
+    "perf-hunt-5-t3",
+    "perf-hunt-5",
+    "A house number over 100",
+    1,
+    2,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-45 days','+8 minutes'))",
+   "params": [
+    "perf-hunt-5-t4",
+    "perf-hunt-5",
+    "A garden gnome",
+    2,
+    3,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-45 days','+9 minutes'))",
+   "params": [
+    "perf-hunt-5-t5",
+    "perf-hunt-5",
+    "A postbox",
+    1,
+    4,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-45 days','+10 minutes'))",
+   "params": [
+    "perf-hunt-5-t6",
+    "perf-hunt-5",
+    "Someone walking more than two dogs",
+    3,
+    5,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44.9 days','+23 minutes'))",
+   "params": [
+    "perf-hunt-5-t1-m2",
+    "perf-hunt-5",
+    "perf-hunt-5-t1",
+    "{{partner}}",
+    "The one by the cafe"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44.5 days','+1 minutes'))",
+   "params": [
+    "perf-hunt-5-t1-m2-aw",
+    "perf-hunt-5",
+    "perf-hunt-5-t1-m2",
+    1,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44.9 days','+29 minutes'))",
+   "params": [
+    "perf-hunt-5-t1-m4",
+    "perf-hunt-5",
+    "perf-hunt-5-t1",
+    "{{child}}",
+    "Behind the shed"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44.5 days','+3 minutes'))",
+   "params": [
+    "perf-hunt-5-t1-m4-aw",
+    "perf-hunt-5",
+    "perf-hunt-5-t1-m4",
+    0,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44.9 days','+32 minutes'))",
+   "params": [
+    "perf-hunt-5-t2-m1",
+    "perf-hunt-5",
+    "perf-hunt-5-t2",
+    "{{me}}",
+    "Nearly missed it"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44.5 days','+2 minutes'))",
+   "params": [
+    "perf-hunt-5-t2-m1-aw",
+    "perf-hunt-5",
+    "perf-hunt-5-t2-m1",
+    2,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44.9 days','+41 minutes'))",
+   "params": [
+    "perf-hunt-5-t2-m4",
+    "perf-hunt-5",
+    "perf-hunt-5-t2",
+    "{{child}}",
+    "Does this count?"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44.5 days','+5 minutes'))",
+   "params": [
+    "perf-hunt-5-t2-m4-aw",
+    "perf-hunt-5",
+    "perf-hunt-5-t2-m4",
+    2,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44.9 days','+44 minutes'))",
+   "params": [
+    "perf-hunt-5-t3-m1",
+    "perf-hunt-5",
+    "perf-hunt-5-t3",
+    "{{me}}",
+    "Mia says hers is better"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44.5 days','+4 minutes'))",
+   "params": [
+    "perf-hunt-5-t3-m1-aw",
+    "perf-hunt-5",
+    "perf-hunt-5-t3-m1",
+    1,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44.9 days','+50 minutes'))",
+   "params": [
+    "perf-hunt-5-t3-m3",
+    "perf-hunt-5",
+    "perf-hunt-5-t3",
+    "{{adult2}}",
+    "On the way back to the car"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44.5 days','+6 minutes'))",
+   "params": [
+    "perf-hunt-5-t3-m3-aw",
+    "perf-hunt-5",
+    "perf-hunt-5-t3-m3",
+    1,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44.9 days','+62 minutes'))",
+   "params": [
+    "perf-hunt-5-t4-m3",
+    "perf-hunt-5",
+    "perf-hunt-5-t4",
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44.9 days','+68 minutes'))",
+   "params": [
+    "perf-hunt-5-t4-m5",
+    "perf-hunt-5",
+    "perf-hunt-5-t4",
+    "{{child2}}",
+    "Behind the shed"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44.5 days','+10 minutes'))",
+   "params": [
+    "perf-hunt-5-t4-m5-aw",
+    "perf-hunt-5",
+    "perf-hunt-5-t4-m5",
+    2,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44.9 days','+71 minutes'))",
+   "params": [
+    "perf-hunt-5-t5-m2",
+    "perf-hunt-5",
+    "perf-hunt-5-t5",
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44.9 days','+80 minutes'))",
+   "params": [
+    "perf-hunt-5-t5-m5",
+    "perf-hunt-5",
+    "perf-hunt-5-t5",
+    "{{child2}}",
+    "Does this count?"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44.5 days','+12 minutes'))",
+   "params": [
+    "perf-hunt-5-t5-m5-aw",
+    "perf-hunt-5",
+    "perf-hunt-5-t5-m5",
+    1,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44.9 days','+83 minutes'))",
+   "params": [
+    "perf-hunt-5-t6-m2",
+    "perf-hunt-5",
+    "perf-hunt-5-t6",
+    "{{partner}}",
+    "Mia says hers is better"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44.5 days','+11 minutes'))",
+   "params": [
+    "perf-hunt-5-t6-m2-aw",
+    "perf-hunt-5",
+    "perf-hunt-5-t6-m2",
+    3,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44.9 days','+89 minutes'))",
+   "params": [
+    "perf-hunt-5-t6-m4",
+    "perf-hunt-5",
+    "perf-hunt-5-t6",
+    "{{child}}",
+    "On the way back to the car"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-44.5 days','+13 minutes'))",
+   "params": [
+    "perf-hunt-5-t6-m4-aw",
+    "perf-hunt-5",
+    "perf-hunt-5-t6-m4",
+    3,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__hunts (id, title, status, visibility, created_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-70 days','+0 minutes'))",
+   "params": [
+    "perf-hunt-6",
+    "Museum trip",
+    "closed",
+    "everyone",
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-70 days','+5 minutes'))",
+   "params": [
+    "perf-hunt-6-t1",
+    "perf-hunt-6",
+    "Something older than 1,000 years",
+    2,
+    0,
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-70 days','+6 minutes'))",
+   "params": [
+    "perf-hunt-6-t2",
+    "perf-hunt-6",
+    "A painting with a dog in it",
+    2,
+    1,
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-70 days','+7 minutes'))",
+   "params": [
+    "perf-hunt-6-t3",
+    "perf-hunt-6",
+    "A suit of armour",
+    1,
+    2,
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-70 days','+8 minutes'))",
+   "params": [
+    "perf-hunt-6-t4",
+    "perf-hunt-6",
+    "The smallest thing on display",
+    3,
+    3,
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-70 days','+9 minutes'))",
+   "params": [
+    "perf-hunt-6-t5",
+    "perf-hunt-6",
+    "A map",
+    1,
+    4,
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-70 days','+10 minutes'))",
+   "params": [
+    "perf-hunt-6-t6",
+    "perf-hunt-6",
+    "Something you would like to take home",
+    1,
+    5,
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69.9 days','+20 minutes'))",
+   "params": [
+    "perf-hunt-6-t1-m1",
+    "perf-hunt-6",
+    "perf-hunt-6-t1",
+    "{{me}}",
+    "Behind the shed"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69.5 days','+0 minutes'))",
+   "params": [
+    "perf-hunt-6-t1-m1-aw",
+    "perf-hunt-6",
+    "perf-hunt-6-t1-m1",
+    2,
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69.9 days','+29 minutes'))",
+   "params": [
+    "perf-hunt-6-t1-m4",
+    "perf-hunt-6",
+    "perf-hunt-6-t1",
+    "{{child}}",
+    "On the way back to the car"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69.5 days','+3 minutes'))",
+   "params": [
+    "perf-hunt-6-t1-m4-aw",
+    "perf-hunt-6",
+    "perf-hunt-6-t1-m4",
+    0,
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69.9 days','+32 minutes'))",
+   "params": [
+    "perf-hunt-6-t2-m1",
+    "perf-hunt-6",
+    "perf-hunt-6-t2",
+    "{{me}}",
+    "Does this count?"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69.5 days','+2 minutes'))",
+   "params": [
+    "perf-hunt-6-t2-m1-aw",
+    "perf-hunt-6",
+    "perf-hunt-6-t2-m1",
+    2,
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69.9 days','+38 minutes'))",
+   "params": [
+    "perf-hunt-6-t2-m3",
+    "perf-hunt-6",
+    "perf-hunt-6-t2",
+    "{{adult2}}",
+    "Took three tries to get the photo"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69.5 days','+4 minutes'))",
+   "params": [
+    "perf-hunt-6-t2-m3-aw",
+    "perf-hunt-6",
+    "perf-hunt-6-t2-m3",
+    0,
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69.9 days','+50 minutes'))",
+   "params": [
+    "perf-hunt-6-t3-m3",
+    "perf-hunt-6",
+    "perf-hunt-6-t3",
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69.5 days','+6 minutes'))",
+   "params": [
+    "perf-hunt-6-t3-m3-aw",
+    "perf-hunt-6",
+    "perf-hunt-6-t3-m3",
+    1,
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69.9 days','+56 minutes'))",
+   "params": [
+    "perf-hunt-6-t3-m5",
+    "perf-hunt-6",
+    "perf-hunt-6-t3",
+    "{{child2}}",
+    "Leo spotted it first"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69.5 days','+8 minutes'))",
+   "params": [
+    "perf-hunt-6-t3-m5-aw",
+    "perf-hunt-6",
+    "perf-hunt-6-t3-m5",
+    1,
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69.9 days','+59 minutes'))",
+   "params": [
+    "perf-hunt-6-t4-m2",
+    "perf-hunt-6",
+    "perf-hunt-6-t4",
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69.5 days','+7 minutes'))",
+   "params": [
+    "perf-hunt-6-t4-m2-aw",
+    "perf-hunt-6",
+    "perf-hunt-6-t4-m2",
+    3,
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69.9 days','+68 minutes'))",
+   "params": [
+    "perf-hunt-6-t4-m5",
+    "perf-hunt-6",
+    "perf-hunt-6-t4",
+    "{{child2}}",
+    "On the way back to the car"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69.5 days','+10 minutes'))",
+   "params": [
+    "perf-hunt-6-t4-m5-aw",
+    "perf-hunt-6",
+    "perf-hunt-6-t4-m5",
+    3,
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69.9 days','+71 minutes'))",
+   "params": [
+    "perf-hunt-6-t5-m2",
+    "perf-hunt-6",
+    "perf-hunt-6-t5",
+    "{{partner}}",
+    "Does this count?"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69.9 days','+77 minutes'))",
+   "params": [
+    "perf-hunt-6-t5-m4",
+    "perf-hunt-6",
+    "perf-hunt-6-t5",
+    "{{child}}",
+    "Took three tries to get the photo"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69.5 days','+11 minutes'))",
+   "params": [
+    "perf-hunt-6-t5-m4-aw",
+    "perf-hunt-6",
+    "perf-hunt-6-t5-m4",
+    1,
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69.9 days','+80 minutes'))",
+   "params": [
+    "perf-hunt-6-t6-m1",
+    "perf-hunt-6",
+    "perf-hunt-6-t6",
+    "{{me}}",
+    "On the way back to the car"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69.9 days','+89 minutes'))",
+   "params": [
+    "perf-hunt-6-t6-m4",
+    "perf-hunt-6",
+    "perf-hunt-6-t6",
+    "{{child}}",
+    "Nearly missed it"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-69.5 days','+13 minutes'))",
+   "params": [
+    "perf-hunt-6-t6-m4-aw",
+    "perf-hunt-6",
+    "perf-hunt-6-t6-m4",
+    1,
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__hunts (id, title, status, visibility, created_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-95 days','+0 minutes'))",
+   "params": [
+    "perf-hunt-7",
+    "Autumn woods",
+    "closed",
+    "everyone",
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-95 days','+5 minutes'))",
+   "params": [
+    "perf-hunt-7-t1",
+    "perf-hunt-7",
+    "A conker still in its shell",
+    1,
+    0,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-95 days','+6 minutes'))",
+   "params": [
+    "perf-hunt-7-t2",
+    "perf-hunt-7",
+    "A mushroom (look, do not touch)",
+    2,
+    1,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-95 days','+7 minutes'))",
+   "params": [
+    "perf-hunt-7-t3",
+    "perf-hunt-7",
+    "Five different coloured leaves",
+    2,
+    2,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-95 days','+8 minutes'))",
+   "params": [
+    "perf-hunt-7-t4",
+    "perf-hunt-7",
+    "A tree you cannot reach around",
+    1,
+    3,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-95 days','+9 minutes'))",
+   "params": [
+    "perf-hunt-7-t5",
+    "perf-hunt-7",
+    "Animal tracks",
+    3,
+    4,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-95 days','+10 minutes'))",
+   "params": [
+    "perf-hunt-7-t6",
+    "perf-hunt-7",
+    "A stick shaped like a Y",
+    1,
+    5,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94.9 days','+20 minutes'))",
+   "params": [
+    "perf-hunt-7-t1-m1",
+    "perf-hunt-7",
+    "perf-hunt-7-t1",
+    "{{me}}",
+    "On the way back to the car"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94.5 days','+0 minutes'))",
+   "params": [
+    "perf-hunt-7-t1-m1-aw",
+    "perf-hunt-7",
+    "perf-hunt-7-t1-m1",
+    1,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94.9 days','+26 minutes'))",
+   "params": [
+    "perf-hunt-7-t1-m3",
+    "perf-hunt-7",
+    "perf-hunt-7-t1",
+    "{{adult2}}",
+    "Found it under the bench"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94.5 days','+2 minutes'))",
+   "params": [
+    "perf-hunt-7-t1-m3-aw",
+    "perf-hunt-7",
+    "perf-hunt-7-t1-m3",
+    1,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94.9 days','+38 minutes'))",
+   "params": [
+    "perf-hunt-7-t2-m3",
+    "perf-hunt-7",
+    "perf-hunt-7-t2",
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94.5 days','+4 minutes'))",
+   "params": [
+    "perf-hunt-7-t2-m3-aw",
+    "perf-hunt-7",
+    "perf-hunt-7-t2-m3",
+    0,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94.9 days','+44 minutes'))",
+   "params": [
+    "perf-hunt-7-t2-m5",
+    "perf-hunt-7",
+    "perf-hunt-7-t2",
+    "{{child2}}",
+    "Grandpa's pocket knife"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94.9 days','+47 minutes'))",
+   "params": [
+    "perf-hunt-7-t3-m2",
+    "perf-hunt-7",
+    "perf-hunt-7-t3",
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94.5 days','+5 minutes'))",
+   "params": [
+    "perf-hunt-7-t3-m2-aw",
+    "perf-hunt-7",
+    "perf-hunt-7-t3-m2",
+    0,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94.9 days','+56 minutes'))",
+   "params": [
+    "perf-hunt-7-t3-m5",
+    "perf-hunt-7",
+    "perf-hunt-7-t3",
+    "{{child2}}",
+    "Took three tries to get the photo"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94.5 days','+8 minutes'))",
+   "params": [
+    "perf-hunt-7-t3-m5-aw",
+    "perf-hunt-7",
+    "perf-hunt-7-t3-m5",
+    2,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94.9 days','+59 minutes'))",
+   "params": [
+    "perf-hunt-7-t4-m2",
+    "perf-hunt-7",
+    "perf-hunt-7-t4",
+    "{{partner}}",
+    "On the way back to the car"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94.5 days','+7 minutes'))",
+   "params": [
+    "perf-hunt-7-t4-m2-aw",
+    "perf-hunt-7",
+    "perf-hunt-7-t4-m2",
+    1,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94.9 days','+65 minutes'))",
+   "params": [
+    "perf-hunt-7-t4-m4",
+    "perf-hunt-7",
+    "perf-hunt-7-t4",
+    "{{child}}",
+    "Found it under the bench"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94.5 days','+9 minutes'))",
+   "params": [
+    "perf-hunt-7-t4-m4-aw",
+    "perf-hunt-7",
+    "perf-hunt-7-t4-m4",
+    1,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94.9 days','+68 minutes'))",
+   "params": [
+    "perf-hunt-7-t5-m1",
+    "perf-hunt-7",
+    "perf-hunt-7-t5",
+    "{{me}}",
+    "Took three tries to get the photo"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94.5 days','+8 minutes'))",
+   "params": [
+    "perf-hunt-7-t5-m1-aw",
+    "perf-hunt-7",
+    "perf-hunt-7-t5-m1",
+    3,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94.9 days','+77 minutes'))",
+   "params": [
+    "perf-hunt-7-t5-m4",
+    "perf-hunt-7",
+    "perf-hunt-7-t5",
+    "{{child}}",
+    "Behind the shed"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94.5 days','+11 minutes'))",
+   "params": [
+    "perf-hunt-7-t5-m4-aw",
+    "perf-hunt-7",
+    "perf-hunt-7-t5-m4",
+    3,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94.9 days','+80 minutes'))",
+   "params": [
+    "perf-hunt-7-t6-m1",
+    "perf-hunt-7",
+    "perf-hunt-7-t6",
+    "{{me}}",
+    "Nearly missed it"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94.9 days','+86 minutes'))",
+   "params": [
+    "perf-hunt-7-t6-m3",
+    "perf-hunt-7",
+    "perf-hunt-7-t6",
+    "{{adult2}}",
+    "Leo spotted it first"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-94.5 days','+12 minutes'))",
+   "params": [
+    "perf-hunt-7-t6-m3-aw",
+    "perf-hunt-7",
+    "perf-hunt-7-t6-m3",
+    1,
+    "{{me}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__hunts (id, title, status, visibility, created_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-130 days','+0 minutes'))",
+   "params": [
+    "perf-hunt-8",
+    "Birthday party hunt",
+    "closed",
+    "everyone",
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-130 days','+5 minutes'))",
+   "params": [
+    "perf-hunt-8-t1",
+    "perf-hunt-8",
+    "The hidden balloon",
+    1,
+    0,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-130 days','+6 minutes'))",
+   "params": [
+    "perf-hunt-8-t2",
+    "perf-hunt-8",
+    "Something with the birthday girl's name on it",
+    1,
+    1,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-130 days','+7 minutes'))",
+   "params": [
+    "perf-hunt-8-t3",
+    "perf-hunt-8",
+    "A spoon in the wrong room",
+    2,
+    2,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-130 days','+8 minutes'))",
+   "params": [
+    "perf-hunt-8-t4",
+    "perf-hunt-8",
+    "The golden envelope",
+    3,
+    3,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-130 days','+9 minutes'))",
+   "params": [
+    "perf-hunt-8-t5",
+    "perf-hunt-8",
+    "Someone wearing stripes",
+    1,
+    4,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-130 days','+10 minutes'))",
+   "params": [
+    "perf-hunt-8-t6",
+    "perf-hunt-8",
+    "The cake before it is cut",
+    1,
+    5,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-129.9 days','+26 minutes'))",
+   "params": [
+    "perf-hunt-8-t1-m3",
+    "perf-hunt-8",
+    "perf-hunt-8-t1",
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-129.5 days','+2 minutes'))",
+   "params": [
+    "perf-hunt-8-t1-m3-aw",
+    "perf-hunt-8",
+    "perf-hunt-8-t1-m3",
+    1,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-129.9 days','+32 minutes'))",
+   "params": [
+    "perf-hunt-8-t1-m5",
+    "perf-hunt-8",
+    "perf-hunt-8-t1",
+    "{{child2}}",
+    "Best one of the day"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-129.5 days','+4 minutes'))",
+   "params": [
+    "perf-hunt-8-t1-m5-aw",
+    "perf-hunt-8",
+    "perf-hunt-8-t1-m5",
+    1,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-129.9 days','+35 minutes'))",
+   "params": [
+    "perf-hunt-8-t2-m2",
+    "perf-hunt-8",
+    "perf-hunt-8-t2",
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-129.5 days','+3 minutes'))",
+   "params": [
+    "perf-hunt-8-t2-m2-aw",
+    "perf-hunt-8",
+    "perf-hunt-8-t2-m2",
+    1,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-129.9 days','+44 minutes'))",
+   "params": [
+    "perf-hunt-8-t2-m5",
+    "perf-hunt-8",
+    "perf-hunt-8-t2",
+    "{{child2}}",
+    "Found it under the bench"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-129.9 days','+47 minutes'))",
+   "params": [
+    "perf-hunt-8-t3-m2",
+    "perf-hunt-8",
+    "perf-hunt-8-t3",
+    "{{partner}}",
+    "Took three tries to get the photo"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-129.5 days','+5 minutes'))",
+   "params": [
+    "perf-hunt-8-t3-m2-aw",
+    "perf-hunt-8",
+    "perf-hunt-8-t3-m2",
+    0,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-129.9 days','+53 minutes'))",
+   "params": [
+    "perf-hunt-8-t3-m4",
+    "perf-hunt-8",
+    "perf-hunt-8-t3",
+    "{{child}}",
+    "The stone step by the gate"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-129.9 days','+56 minutes'))",
+   "params": [
+    "perf-hunt-8-t4-m1",
+    "perf-hunt-8",
+    "perf-hunt-8-t4",
+    "{{me}}",
+    "Found it under the bench"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-129.5 days','+6 minutes'))",
+   "params": [
+    "perf-hunt-8-t4-m1-aw",
+    "perf-hunt-8",
+    "perf-hunt-8-t4-m1",
+    0,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-129.9 days','+65 minutes'))",
+   "params": [
+    "perf-hunt-8-t4-m4",
+    "perf-hunt-8",
+    "perf-hunt-8-t4",
+    "{{child}}",
+    "Leo spotted it first"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-129.5 days','+9 minutes'))",
+   "params": [
+    "perf-hunt-8-t4-m4-aw",
+    "perf-hunt-8",
+    "perf-hunt-8-t4-m4",
+    3,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-129.9 days','+68 minutes'))",
+   "params": [
+    "perf-hunt-8-t5-m1",
+    "perf-hunt-8",
+    "perf-hunt-8-t5",
+    "{{me}}",
+    "Behind the shed"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-129.5 days','+8 minutes'))",
+   "params": [
+    "perf-hunt-8-t5-m1-aw",
+    "perf-hunt-8",
+    "perf-hunt-8-t5-m1",
+    1,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-129.9 days','+74 minutes'))",
+   "params": [
+    "perf-hunt-8-t5-m3",
+    "perf-hunt-8",
+    "perf-hunt-8-t5",
+    "{{adult2}}",
+    "Grandpa's pocket knife"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-129.5 days','+10 minutes'))",
+   "params": [
+    "perf-hunt-8-t5-m3-aw",
+    "perf-hunt-8",
+    "perf-hunt-8-t5-m3",
+    1,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, created_at) VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-129.9 days','+86 minutes'))",
+   "params": [
+    "perf-hunt-8-t6-m3",
+    "perf-hunt-8",
+    "perf-hunt-8-t6",
+    "{{adult2}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-129.5 days','+12 minutes'))",
+   "params": [
+    "perf-hunt-8-t6-m3-aw",
+    "perf-hunt-8",
+    "perf-hunt-8-t6-m3",
+    1,
+    "{{partner}}"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, caption, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-129.9 days','+92 minutes'))",
+   "params": [
+    "perf-hunt-8-t6-m5",
+    "perf-hunt-8",
+    "perf-hunt-8-t6",
+    "{{child2}}",
+    "The stone step by the gate"
+   ]
+  },
+  {
+   "sql": "INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ','now','-129.5 days','+14 minutes'))",
+   "params": [
+    "perf-hunt-8-t6-m5-aw",
+    "perf-hunt-8",
+    "perf-hunt-8-t6-m5",
+    1,
+    "{{partner}}"
+   ]
+  }
+ ]
+}
