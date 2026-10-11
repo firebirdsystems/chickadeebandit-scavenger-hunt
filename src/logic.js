@@ -12,6 +12,28 @@ export function isOrganizer(hunt, me) {
   return !!me && !!hunt && hunt.created_by === me.id;
 }
 
+/**
+ * Who a hunt is shown to at each stage. A draft is the organizer's alone: its
+ * list is the game, and a hunt everyone can read lets the list be read before
+ * the start. "private" is in no visibility tier, so the hub returns the row,
+ * and the tasks that inherit from it, to its organizer only. Starting the hunt
+ * opens it to everyone.
+ */
+export function huntVisibility(status) {
+  return status === "draft" ? "private" : "everyone";
+}
+
+/**
+ * The member's own hunts stored with the wrong visibility for their stage. A
+ * page from before drafts were private writes a draft as "everyone" and starts
+ * a hunt by its status alone, so a tab left open across that release can leave
+ * a draft whose list anyone can read, or a started hunt nobody else is shown.
+ * The organizer's page puts both right when it next loads.
+ */
+export function misfiledHunts(hunts, me) {
+  return hunts.filter((h) => isOrganizer(h, me) && h.visibility !== huntVisibility(h.status));
+}
+
 export function statusLabel(status) {
   return { draft: "Draft", open: "The hunt is on!", closed: "Revealed" }[status] ?? status;
 }
@@ -62,6 +84,14 @@ export function scoreboard(awards, submissions, huntId) {
     totals.set(sub.member_id, cur);
   }
   return [...totals.values()].sort((a, b) => b.points - a.points || b.finds - a.finds);
+}
+
+/**
+ * The picture to draw for a find in the reveal grid: its small copy when the
+ * hub kept one, else the photo itself. "" for a find with a caption only.
+ */
+export function tilePhotoId(submission) {
+  return submission?.thumb_file_id || submission?.photo_file_id || "";
 }
 
 /**

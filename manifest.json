@@ -43,7 +43,7 @@
       ],
       "visible_where": { "column": "status", "values": ["closed"] },
       "aggregates": [
-        { "label": "Photos", "table": "submissions", "fk_column": "hunt_id", "op": "count" }
+        { "label": "Finds", "table": "submissions", "fk_column": "hunt_id", "op": "count" }
       ],
       "feeds": [
         {
@@ -145,7 +145,8 @@
   },
   "delete_file_columns": {
     "submissions": [
-      "photo_file_id"
+      "photo_file_id",
+      "thumb_file_id"
     ]
   },
   "delete_cascades": {
@@ -157,7 +158,7 @@
       {
         "table": "submissions",
         "foreign_key": "hunt_id",
-        "file_id_column": "photo_file_id"
+        "file_id_column": ["photo_file_id", "thumb_file_id"]
       },
       {
         "table": "awards",
@@ -168,7 +169,7 @@
       {
         "table": "submissions",
         "foreign_key": "task_id",
-        "file_id_column": "photo_file_id"
+        "file_id_column": ["photo_file_id", "thumb_file_id"]
       }
     ]
   },
@@ -184,7 +185,7 @@
     "submissions": {
       "column": "member_id",
       "on_removed": "delete",
-      "file_id_column": "photo_file_id"
+      "file_id_column": ["photo_file_id", "thumb_file_id"]
     },
     "awards": {
       "column": "awarded_by",

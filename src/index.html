@@ -122,10 +122,10 @@
 </div>
 
 <script type="module">
-import { esc, hubConfirm, hubAlert, createFilesHelper, createShareHelper, searchMatch, glyph, chickadee, activeShareLinks, SHARE_EXPIRY_CHOICES, DEFAULT_SHARE_EXPIRY_HOURS } from "/hub-sdk.js";
+import { esc, isAdult, hubConfirm, hubAlert, createFilesHelper, createShareHelper, searchMatch, glyph, chickadee, activeShareLinks, SHARE_EXPIRY_CHOICES, DEFAULT_SHARE_EXPIRY_HOURS } from "/hub-sdk.js";
 import {
   isOrganizer, statusLabel, visibleHunts, huntTasks, submissionFor,
-  foundCount, awardBySubmission, scoreboard, searchableFields,
+  foundCount, awardBySubmission, scoreboard, searchableFields, tilePhotoId, huntVisibility, misfiledHunts,
 } from "./logic.js";
 
 const CONTEXT = window.__CONTEXT_URL ?? "";
@@ -174,7 +174,13 @@ async function db(sql, params = []) {
     body: JSON.stringify({ sql, params }),
   });
   const json = await res.json();
-  if (json.error) throw new Error(json.error);
+  if (json.error) {
+    // The hub answered, and said no. Told apart from a request that never
+    // got an answer, where nothing is known about what was written.
+    const refusal = new Error(json.error);
+    refusal.refused = true;
+    throw refusal;
+  }
   return json;
 }
 
@@ -208,6 +214,17 @@ async function loadData() {
   }
   const h = await db("SELECT id, title, status, visibility, created_by, created_at FROM app_scavenger_hunt__hunts ORDER BY created_at DESC LIMIT 50");
   hunts = h.rows ?? [];
+  // Best effort: a failure leaves the hunt as it was, to be tried next load.
+  for (const hunt of misfiledHunts(hunts, HUB_MEMBER)) {
+    const visibility = huntVisibility(hunt.status);
+    try {
+      // Only while the hunt is still at the stage this was worked out for.
+      // Another tab can start a draft between the read and this write, and
+      // "private", right for the draft, would then hide a hunt that is on.
+      const { changed } = await db("UPDATE app_scavenger_hunt__hunts SET visibility=? WHERE id=? AND status=?", [visibility, hunt.id, hunt.status]);
+      if (changed !== 0) hunt.visibility = visibility;
+    } catch { /* left as stored; the organizer sees it either way */ }
+  }
   ({ tasks, submissions, awards } = await loadChildrenFor(hunts));
 }
 
@@ -230,7 +247,7 @@ async function loadChildrenFor(huntList) {
     db(`SELECT id, hunt_id, title, points, sort_order, created_by, created_at FROM app_scavenger_hunt__tasks WHERE hunt_id IN (${holes})`, ids),
     // The hub's sealed_until policy filters this to my own submissions plus
     // everything on hunts that have closed — no client-side gating needed.
-    db(`SELECT id, hunt_id, task_id, member_id, photo_file_id, caption, created_at FROM app_scavenger_hunt__submissions WHERE hunt_id IN (${holes})`, ids),
+    db(`SELECT id, hunt_id, task_id, member_id, photo_file_id, thumb_file_id, caption, created_at FROM app_scavenger_hunt__submissions WHERE hunt_id IN (${holes})`, ids),
     db(`SELECT id, hunt_id, submission_id, points_awarded, awarded_by, created_at FROM app_scavenger_hunt__awards WHERE hunt_id IN (${holes})`, ids),
   ]);
   return { tasks: t.rows ?? [], submissions: s.rows ?? [], awards: a.rows ?? [] };
@@ -249,7 +266,7 @@ function showError(msg) { error = msg; render(); }
 
 /* ── Mutations ─────────────────────────────────────────────────────────────── */
 async function createHunt(title) {
-  const row = { id: crypto.randomUUID(), title, status: "draft", visibility: "everyone", created_by: me.id, created_at: nowIso() };
+  const row = { id: crypto.randomUUID(), title, status: "draft", visibility: huntVisibility("draft"), created_by: me.id, created_at: nowIso() };
   hunts = [row, ...hunts];
   openHuntId = row.id;
   closeModal(); render();
@@ -264,14 +281,26 @@ async function createHunt(title) {
 }
 
 async function setHuntStatus(id, status) {
-  const idx = hunts.findIndex((h) => h.id === id);
-  if (idx === -1) return;
-  const prev = hunts[idx];
-  hunts[idx] = { ...prev, status };
+  const prev = hunts.find((h) => h.id === id);
+  if (!prev) return;
+  // A draft is the organizer's alone; starting the hunt is what shows it, and
+  // its list, to everyone (see huntVisibility).
+  const visibility = huntVisibility(status);
+  // By id, here and in the undo: the list can gain or lose a hunt while this
+  // is out, and a remembered position then names a different one.
+  hunts = hunts.map((h) => (h.id === id ? { ...prev, status, visibility } : h));
+  // Until the reveal's re-read lands the page holds only this member's own
+  // finds: it says so, and awards wait, since the re-read replaces them.
+  if (status === "closed") revealing = id;
   render();
   try {
-    await db("UPDATE app_scavenger_hunt__hunts SET status=? WHERE id=?", [status, id]);
-    if (status === "closed") await refresh(); // sealed submissions just released
+    await db("UPDATE app_scavenger_hunt__hunts SET status=?, visibility=? WHERE id=?", [status, visibility, id]);
+    if (status === "closed") {
+      await refresh(); // sealed submissions just released
+      // The reveal is on the page now; the announcement below is not part of it.
+      revealing = null;
+      render();
+    }
     // Real transitions only — re-saving the same status publishes nothing. No
     // task, caption or photo travels: opening is an invitation and closing is
     // the reveal, and both are already household-visible facts.
@@ -281,7 +310,17 @@ async function setHuntStatus(id, status) {
         organizer_id: prev.created_by,
       });
     }
-  } catch (e) { hunts[idx] = prev; showError(e.message); }
+  } catch (e) { hunts = hunts.map((h) => (h.id === id ? prev : h)); showError(e.message); }
+  finally {
+    if (revealing === id) { revealing = null; render(); }
+  }
+}
+let revealing = null;   // id of the hunt whose reveal is being read
+
+// Ending is the reveal and it cannot be taken back: finds are frozen from then on.
+async function closeHunt(id) {
+  const ok = await hubConfirm({ message: "End the hunt and reveal everyone's finds?", description: "Nobody can add a find after this, and it can't be reopened.", confirmLabel: "End & reveal" });
+  if (ok) await setHuntStatus(id, "closed");
 }
 
 /*
@@ -305,9 +344,10 @@ async function setHuntStatus(id, status) {
 async function deleteHunt(id) {
   const ok = await hubConfirm({ message: "Delete this hunt?", description: "Tasks, photos, and scores go with it.", confirmLabel: "Delete", destructive: true });
   if (!ok) return;
-  const prev = hunts;
+  const removed = hunts.find((h) => h.id === id);
+  const wasOpen = openHuntId === id;
   hunts = hunts.filter((h) => h.id !== id);
-  if (openHuntId === id) openHuntId = null;
+  if (wasOpen) openHuntId = null;
   render();
   try {
     await db("DELETE FROM app_scavenger_hunt__hunts WHERE id=?", [id]);
@@ -315,7 +355,13 @@ async function deleteHunt(id) {
     tasks = tasks.filter((t) => t.hunt_id !== id);
     awards = awards.filter((a) => a.hunt_id !== id);
   }
-  catch (e) { hunts = prev; showError(e.message); }
+  catch (e) {
+    // Put back the one hunt, not the list as it was: anything added or removed
+    // since then stays as it is.
+    if (removed && !hunts.some((h) => h.id === id)) hunts = [...hunts, removed];
+    if (wasOpen && openHuntId === null) openHuntId = id;
+    showError(e.message);
+  }
 }
 
 async function addTask(huntId, title, points) {
@@ -329,7 +375,7 @@ async function addTask(huntId, title, points) {
 }
 
 async function deleteTask(id) {
-  const prev = tasks;
+  const removed = tasks.find((t) => t.id === id);
   tasks = tasks.filter((t) => t.id !== id);
   render();
   try {
@@ -338,28 +384,51 @@ async function deleteTask(id) {
     await db("DELETE FROM app_scavenger_hunt__tasks WHERE id=?", [id]);
     submissions = submissions.filter((s) => s.task_id !== id);
   }
-  catch (e) { tasks = prev; showError(e.message); }
+  catch (e) {
+    // The one task back, so a second removal that did go through stays gone.
+    if (removed && !tasks.some((t) => t.id === id)) tasks = [...tasks, removed];
+    showError(e.message);
+  }
 }
 
 async function submitFind(hunt, taskId, file, caption) {
-  let fileId = "";
+  let fileId = "", thumbId = null;
   if (file) {
     try {
-      const up = await files.upload(file);
+      // The hub keeps a small copy with the photo, which is what the reveal grid draws.
+      const up = await files.upload(file, { thumbnail: true });
       fileId = up.id;
+      thumbId = up.thumbnailId ?? null;
     } catch (e) { showError(`Photo upload failed: ${e.message}`); return; }
   }
-  const row = { id: crypto.randomUUID(), hunt_id: hunt.id, task_id: taskId, member_id: me.id, photo_file_id: fileId, caption, created_at: nowIso() };
+  const row = { id: crypto.randomUUID(), hunt_id: hunt.id, task_id: taskId, member_id: me.id, photo_file_id: fileId, thumb_file_id: thumbId, caption, created_at: nowIso() };
+  // Not drawn as sealed until it is: the form stays as it is, "Sealing…", with
+  // its photo and caption, so a find that does not land can be sent again
+  // without retaking the picture.
+  try {
+    await db("INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, photo_file_id, thumb_file_id, caption, created_at) VALUES (?,?,?,?,?,?,?,?)",
+      [row.id, row.hunt_id, row.task_id, row.member_id, row.photo_file_id, row.thumb_file_id, row.caption, row.created_at]);
+  } catch (e) {
+    // An error is not proof the find is absent. A lost reply is the plain
+    // case, and the hub itself answers with an error when the database stalls
+    // on a write that may yet land. So the row is looked for either way, and
+    // the photo goes only when the hub refused AND the row is confirmed not
+    // there: a find that landed with its photo deleted was a broken tile at
+    // the reveal that its hunter could not replace (one find per task). An
+    // unused photo is the cheaper mistake.
+    let saved = null;   // true, false, or null when that could not be asked either
+    try {
+      saved = ((await db("SELECT id FROM app_scavenger_hunt__submissions WHERE id=?", [row.id])).rows ?? []).length > 0;
+    } catch { /* still unknown */ }
+    if (!saved) {
+      const refused = e?.refused === true && saved === false;
+      if (refused && fileId) files.delete(fileId).catch(() => {});
+      showError(refused ? e.message : "Couldn't confirm your find was saved. Reload to check before trying again.");
+      return;
+    }
+  }
   submissions = [...submissions, row];
   render();
-  try {
-    await db("INSERT INTO app_scavenger_hunt__submissions (id, hunt_id, task_id, member_id, photo_file_id, caption, created_at) VALUES (?,?,?,?,?,?,?)",
-      [row.id, row.hunt_id, row.task_id, row.member_id, row.photo_file_id, row.caption, row.created_at]);
-  } catch (e) {
-    submissions = submissions.filter((s) => s.id !== row.id);
-    if (fileId) files.delete(fileId).catch(() => {});
-    showError(e.message);
-  }
 }
 
 async function awardPoints(hunt, submissionId, points) {
@@ -382,6 +451,16 @@ async function awardPoints(hunt, submissionId, points) {
 }
 
 /* ── Rendering ─────────────────────────────────────────────────────────────── */
+// Points typed into an award box and not yet awarded, by submission id. Each
+// award redraws the hunt, and a box drawn from stored values alone put every
+// other typed number back (a typed 0 became the task's default).
+const awardDrafts = new Map();
+const awarding = new Set();   // submission ids with an award write still out
+document.addEventListener("input", (e) => {
+  const id = e.target?.getAttribute?.("data-award-input");
+  if (id) awardDrafts.set(id, e.target.value);
+});
+
 // The view is drawn whole, so put the caret back after typing.
 document.addEventListener("input", (e) => {
   if (e.target.id !== "search") return;
@@ -424,16 +503,20 @@ function renderHuntList() {
 function renderFind(hunt, s, organizer) {
   const awardMap = awardBySubmission(awards, hunt.id);
   const award = awardMap.get(s.id);
+  // The box starts at what the task is worth, so awarding is one tap. A number
+  // already typed there outlives the redraws other awards cause (awardDrafts).
+  const worth = Number(tasks.find((t) => t.id === s.task_id)?.points) || 1;
+  const boxValue = awardDrafts.has(s.id) ? awardDrafts.get(s.id) : String(award ? Number(award.points_awarded) : worth);
   return `
     <div class="find" data-testid="find" data-submission-id="${esc(s.id)}" data-mine="${s.member_id === me?.id ? "yes" : "no"}">
-      ${s.photo_file_id ? `<img src="${esc(files.url(s.photo_file_id))}" alt="Find by ${esc(memberName(s.member_id))}" loading="lazy" />` : ""}
+      ${s.photo_file_id ? `<a href="${esc(files.url(s.photo_file_id))}" target="_blank" rel="noopener" aria-label="Open the full photo by ${esc(memberName(s.member_id))}"><img src="${esc(files.url(tilePhotoId(s)))}" alt="Find by ${esc(memberName(s.member_id))}" loading="lazy" /></a>` : ""}
       <div class="find-meta">
         <span class="who">${esc(memberName(s.member_id))}</span>
         ${s.caption ? ` — ${esc(s.caption)}` : ""}
         ${award ? `<div>${glyph("medal")} ${esc(String(Number(award.points_awarded)))} pts</div>` : ""}
         ${organizer && hunt.status === "closed" ? `
           <div class="award-row">
-            <input type="number" min="0" max="99" value="${award ? esc(String(Number(award.points_awarded))) : ""}" data-award-input="${esc(s.id)}" placeholder="pts" />
+            <input type="number" min="0" max="99" value="${esc(boxValue)}" data-award-input="${esc(s.id)}" placeholder="pts" />
             <button class="btn btn-ghost btn-sm" data-testid="award-btn" data-submission-id="${esc(s.id)}" data-award="${esc(s.id)}">Award</button>
           </div>` : ""}
       </div>
@@ -456,7 +539,9 @@ function renderTask(hunt, task, organizer) {
             <input type="text" placeholder="Caption (optional)" maxlength="120" />
             <button type="submit" class="btn btn-sm">Submit find</button>
           </form>`) : ""}
-      ${hunt.status === "closed" ? (taskSubs.length
+      ${hunt.status === "closed" ? (revealing === hunt.id
+        ? `<div class="sealed">Revealing the finds…</div>`
+        : taskSubs.length
         ? `<div class="finds">${taskSubs.map((s) => renderFind(hunt, s, organizer)).join("")}</div>`
         : `<div class="sealed">Nobody found this one.</div>`) : ""}
     </div>`;
@@ -479,7 +564,7 @@ function renderHunt(hunt) {
           ${hunt.status === "draft" ? `<button class="btn btn-sm" data-start-hunt>Start the hunt</button>` : ""}
           ${hunt.status === "open" ? `<button class="btn btn-sm" data-close-hunt>End & reveal</button>` : ""}
           ${hunt.status === "draft" ? `<button class="btn btn-ghost btn-sm" data-add-task>+ Thing to find</button>` : ""}
-          ${hunt.status === "closed" && share.enabled ? `<button class="btn btn-ghost btn-sm" data-share>${glyph("link")} Share gallery</button>` : ""}
+          ${hunt.status === "closed" && share.enabled && isAdult(me) ? `<button class="btn btn-ghost btn-sm" data-share>${glyph("link")} Share gallery</button>` : ""}
           <button class="btn btn-danger btn-sm" data-delete-hunt>Delete</button>
         </div>` : ""}
     </div>
@@ -504,8 +589,23 @@ function render() {
   const root = document.getElementById("root");
   root.className = "app-root";
   const hunt = openHuntId ? hunts.find((h) => h.id === openHuntId) : null;
+  // The view is drawn whole, and a find form holds things a redraw cannot put
+  // back: a chosen photo, a half-typed caption, a "Sealing…" in progress. One
+  // find landing redrew every other form empty, and a photo being taken for
+  // the next task arrived at an input no longer on the page. So the forms on
+  // screen are carried over, as the same elements, wherever the new view still
+  // has a form for that task.
+  const kept = new Map();
+  root.querySelectorAll("[data-find-form]").forEach((form) => kept.set(form.getAttribute("data-find-form"), form));
+  const focused = document.activeElement;
   root.innerHTML = hunt ? renderHunt(hunt) : renderHuntList();
   root.querySelectorAll("[data-find-form]").forEach((form) => {
+    const carried = kept.get(form.getAttribute("data-find-form"));
+    if (carried) {
+      form.replaceWith(carried);
+      if (focused && carried.contains(focused)) focused.focus();
+      return;
+    }
     form.addEventListener("submit", (e) => {
       e.preventDefault();
       const taskId = form.getAttribute("data-find-form");
@@ -513,8 +613,15 @@ function render() {
       const caption = form.querySelector('input[type="text"]').value.trim();
       if (!file && !caption) { hubAlert("Add a photo or a caption so there's some proof!"); return; }
       const btn = form.querySelector("button");
+      if (btn?.disabled) return;
+      error = "";
       if (btn) { btn.disabled = true; btn.textContent = "Sealing…"; }
-      submitFind(hunt, taskId, file, caption).catch((err) => showError(err.message));
+      // Re-armed either way: a find that landed takes its form off the page,
+      // and one that did not keeps this form, photo and caption included, and
+      // needs its button back.
+      submitFind(hunt, taskId, file, caption)
+        .catch((err) => showError(err.message))
+        .finally(() => { if (btn) { btn.disabled = false; btn.textContent = "Submit find"; } });
     });
   });
 }
@@ -587,11 +694,21 @@ function openTaskEditor(huntId) {
 // Deliberately unattributed. `submissions` carries member_id but no display
 // name, and the feed reads one table, so no name reaches the page — which is
 // the right default for a link that publishes photos of children.
-async function openShareModal(hunt) {
+// `created` is the link a create just returned. It is drawn from that reply
+// when the list read does not carry it (refused, or behind), so a live public
+// address is never left off the screen.
+async function openShareModal(hunt, created = null) {
   const status = await share.listAll();
   shareLinks = status.links;
+  if (created && !shareLinks.some((l) => l.id === created.id)) {
+    shareLinks = [{ id: created.id, url: created.url, itemId: hunt.id, expiresAt: created.expiresAt, revokedAt: null, viewCount: 0, hasPassword: !!created.hasPassword }, ...shareLinks];
+  }
   shareEntitled = status.entitled;
   const live = activeShareLinks(shareLinks, hunt.id);
+  // A refused read comes back as an empty list; `limits` is the tell (the hub
+  // sends it on every read it answers). "No links yet" there would invite a
+  // second link beside one that could not be listed.
+  const refused = status.limits === null && !created;
 
   const rows = live.map((l) => `
     <div class="share-row">
@@ -611,33 +728,52 @@ async function openShareModal(hunt) {
       Anyone with the link sees the finished hunt's list, with points, and its photos and captions — no account, no names.
       Links expire on their own, and revoking one cuts off the photos immediately.
     </p>
-    ${rows || `<p class="muted tiny">No active links yet.</p>`}
+    ${refused
+      ? `<p class="error" data-testid="share-refused">Sharing isn't available here right now. In a shared space only stewards can create links unless a steward opens it up, and a household can switch sharing off entirely.</p>`
+      : rows || `<p class="muted tiny">No active links yet.</p>`}
     ${shareEntitled ? `
-      <input id="share-password" type="text" autocomplete="off" placeholder="Optional password (min 4 chars)" />` : ""}
+      <input id="share-password" type="text" autocomplete="off" placeholder="Optional password (${MIN_SHARE_PASSWORD}+ characters)" />` : ""}
     <div class="share-create">
-      <select id="share-expiry">
+      ${refused ? "" : `<select id="share-expiry">
         ${SHARE_EXPIRY_CHOICES.map(({ hours, label }) =>
               `<option value="${hours}"${hours === DEFAULT_SHARE_EXPIRY_HOURS ? " selected" : ""}>${label}</option>`).join("")}
         ${shareEntitled ? `<option value="8760">1 year</option>` : ""}
       </select>
-      <button class="btn" data-share-create>Create link</button>
+      <button class="btn" data-share-create>Create link</button>`}
       <button class="btn btn-ghost" data-cancel>Close</button>
     </div>
   `);
 }
 
+// The hub's own minimum (share-links.ts MIN_PASSWORD_LENGTH), checked here so
+// the organizer reads why instead of the hub's generic refusal.
+const MIN_SHARE_PASSWORD = 6;
+
 async function createShareLink(hunt) {
   const hours = Number(document.getElementById("share-expiry")?.value) || undefined;
   const password = document.getElementById("share-password")?.value?.trim() || undefined;
+  if (password && password.length < MIN_SHARE_PASSWORD) {
+    hubAlert(`A password needs at least ${MIN_SHARE_PASSWORD} characters.`, { description: "Make it longer, or clear it for a link with no password." });
+    return;
+  }
   const btn = document.querySelector("[data-share-create]");
   if (btn) { btn.disabled = true; btn.textContent = "Creating…"; }
+  let link;
   try {
-    const link = await share.create("hunt", hunt.id, { expiresInHours: hours, label: hunt.title, password });
-    try { await navigator.clipboard.writeText(link.url); } catch { /* the re-render shows the url to copy */ }
-    await openShareModal(hunt);
+    link = await share.create("hunt", hunt.id, { expiresInHours: hours, label: hunt.title, password });
   } catch (err) {
     if (btn) { btn.disabled = false; btn.textContent = "Create link"; }
     hubAlert("Couldn't create share link", { description: err.message });
+    return;
+  }
+  try { await navigator.clipboard.writeText(link.url); } catch { /* the re-render shows the url to copy */ }
+  // The link exists from here on. A list that will not refresh is said as
+  // that, with the address, so nobody mints a second public link to see one.
+  try {
+    await openShareModal(hunt, link);
+  } catch {
+    closeModal();
+    hubAlert("Link created", { description: `The list of links could not refresh, so here it is: ${link.url}` });
   }
 }
 
@@ -655,6 +791,8 @@ async function revokeShareLink(id, hunt) {
 document.addEventListener("click", (e) => {
   const t = e.target.closest("button");
   if (!t) return;
+  // A message is about the action that raised it; the next one starts clean.
+  error = "";
   const hunt = openHuntId ? hunts.find((h) => h.id === openHuntId) : null;
   if (t.hasAttribute("data-open")) { openHuntId = t.getAttribute("data-open"); render(); return; }
   if (t.hasAttribute("data-back")) { openHuntId = null; render(); return; }
@@ -668,7 +806,7 @@ document.addEventListener("click", (e) => {
     setHuntStatus(hunt.id, "open").catch((err) => showError(err.message));
     return;
   }
-  if (t.hasAttribute("data-close-hunt")) { setHuntStatus(hunt.id, "closed").catch((err) => showError(err.message)); return; }
+  if (t.hasAttribute("data-close-hunt")) { closeHunt(hunt.id).catch((err) => showError(err.message)); return; }
   if (t.hasAttribute("data-delete-hunt")) { deleteHunt(hunt.id); return; }
   if (t.hasAttribute("data-share")) { openShareModal(hunt).catch((err) => showError(err.message)); return; }
   if (t.hasAttribute("data-share-create")) { createShareLink(hunt); return; }
@@ -681,8 +819,13 @@ document.addEventListener("click", (e) => {
   if (t.hasAttribute("data-award")) {
     const sid = t.getAttribute("data-award");
     const input = document.querySelector(`input[data-award-input="${CSS.escape(sid)}"]`);
+    // One award per find at a time: a second tap sent an UPDATE that could
+    // overtake the INSERT it was changing, and was lost without a word.
+    if (awarding.has(sid)) return;
     const pts = Math.max(0, Math.min(99, Number(input?.value) || 0));
-    awardPoints(hunt, sid, pts).catch((err) => showError(err.message));
+    awardDrafts.delete(sid);
+    awarding.add(sid);
+    awardPoints(hunt, sid, pts).finally(() => awarding.delete(sid)).catch((err) => showError(err.message));
   }
 });
 

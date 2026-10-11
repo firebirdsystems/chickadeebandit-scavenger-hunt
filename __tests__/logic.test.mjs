@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   isOrganizer, statusLabel, visibleHunts, huntTasks, submissionFor,
-  foundCount, awardBySubmission, scoreboard, searchableFields,
+  foundCount, awardBySubmission, scoreboard, searchableFields, tilePhotoId, huntVisibility, misfiledHunts,
 } from "../src/logic.js";
 
 const me = { id: "org-1", role: "adult" };
@@ -80,5 +80,47 @@ describe("searchableFields", () => {
     const fields = searchableFields({ title: "Garden hunt" }, "Mia");
     expect(fields).toContain("Garden hunt");
     expect(fields).toContain("Mia");
+  });
+});
+
+describe("tilePhotoId", () => {
+  it("draws the small copy when the hub kept one, else the photo", () => {
+    expect(tilePhotoId({ photo_file_id: "p1", thumb_file_id: "t1" })).toBe("t1");
+    expect(tilePhotoId({ photo_file_id: "p1", thumb_file_id: null })).toBe("p1");
+    // A find submitted before the column existed carries no such field.
+    expect(tilePhotoId({ photo_file_id: "p1" })).toBe("p1");
+  });
+  it("is empty for a find with a caption only", () => {
+    expect(tilePhotoId({ photo_file_id: "", thumb_file_id: null })).toBe("");
+    expect(tilePhotoId(null)).toBe("");
+  });
+});
+
+describe("huntVisibility", () => {
+  it("keeps a draft to its organizer and opens a started hunt to everyone", () => {
+    expect(huntVisibility("draft")).toBe("private");
+    expect(huntVisibility("open")).toBe("everyone");
+    expect(huntVisibility("closed")).toBe("everyone");
+  });
+});
+
+describe("misfiledHunts", () => {
+  const organizer = { id: "org-1" };
+  const rows = [
+    { id: "stuck", status: "open", visibility: "private", created_by: "org-1" },
+    { id: "stuck-closed", status: "closed", visibility: "private", created_by: "org-1" },
+    { id: "fine", status: "open", visibility: "everyone", created_by: "org-1" },
+    { id: "draft", status: "draft", visibility: "private", created_by: "org-1" },
+    { id: "open-draft", status: "draft", visibility: "everyone", created_by: "org-1" },
+    { id: "theirs", status: "open", visibility: "private", created_by: "kid-1" },
+    { id: "their-draft", status: "draft", visibility: "everyone", created_by: "kid-1" },
+  ];
+
+  it("names the member's own hunts stored with the wrong visibility for their stage", () => {
+    expect(misfiledHunts(rows, organizer).map((h) => h.id)).toEqual(["stuck", "stuck-closed", "open-draft"]);
+  });
+
+  it("names nothing without a member", () => {
+    expect(misfiledHunts(rows, null)).toEqual([]);
   });
 });
