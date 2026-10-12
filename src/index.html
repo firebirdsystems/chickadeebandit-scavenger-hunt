@@ -272,26 +272,26 @@ async function refresh() {
     await Promise.all([loadMembers(), loadData()]);
     if (openHuntId && !hunts.some((h) => h.id === openHuntId)) openHuntId = null;
     loaded = true; loadFailed = false;
-  } catch (e) { if (loaded) error = e.message; else loadFailed = true; }
+  } catch (e) { console.error(e); if (loaded) error = "Couldn’t load the hunts."; else loadFailed = true; }
   render();
 }
 
 function showError(msg) { error = msg; render(); }
+// Wording this app wrote for the reader is marked where it is thrown; any
+// other failure is said in the app's own fixed line, never the hub's text.
+function userError(msg) { return Object.assign(new Error(msg), { forUser: true }); }
+function failText(e, line) { return e?.forUser ? e.message : line; }
 
 /* ── Mutations ─────────────────────────────────────────────────────────────── */
 async function createHunt(title) {
   const row = { id: crypto.randomUUID(), title, status: "draft", visibility: huntVisibility("draft"), created_by: me.id, created_at: nowIso() };
+  // Not drawn until the hub has it: a save that fails throws to the form,
+  // which says so and stays open as typed (see submitModalForm).
+  await db("INSERT INTO app_scavenger_hunt__hunts (id, title, status, visibility, created_by, created_at) VALUES (?,?,?,?,?,?)",
+    [row.id, row.title, row.status, row.visibility, row.created_by, row.created_at]);
   hunts = [row, ...hunts];
   openHuntId = row.id;
   closeModal(); render();
-  try {
-    await db("INSERT INTO app_scavenger_hunt__hunts (id, title, status, visibility, created_by, created_at) VALUES (?,?,?,?,?,?)",
-      [row.id, row.title, row.status, row.visibility, row.created_by, row.created_at]);
-  } catch (e) {
-    hunts = hunts.filter((h) => h.id !== row.id);
-    openHuntId = null;
-    showError(e.message);
-  }
 }
 
 async function setHuntStatus(id, status) {
@@ -311,7 +311,7 @@ async function setHuntStatus(id, status) {
     const { changed } = await db("UPDATE app_scavenger_hunt__hunts SET status=?, visibility=? WHERE id=?", [status, visibility, id]);
     // Only the organizer may write a hunt; the hub answers anyone else, or a
     // hunt already deleted, with zero rows rather than an error.
-    if (changed === 0) throw new Error("This hunt can no longer be changed.");
+    if (changed === 0) throw userError("This hunt can no longer be changed.");
     if (status === "closed") {
       await refresh(); // sealed submissions just released
       // The reveal is on the page now; the announcement below is not part of it.
@@ -327,7 +327,7 @@ async function setHuntStatus(id, status) {
         organizer_id: prev.created_by,
       });
     }
-  } catch (e) { hunts = hunts.map((h) => (h.id === id ? prev : h)); showError(e.message); }
+  } catch (e) { console.error(e); hunts = hunts.map((h) => (h.id === id ? prev : h)); showError(failText(e, "Couldn’t update the hunt — try again.")); }
   finally {
     if (revealing === id) { revealing = null; render(); }
   }
@@ -368,7 +368,7 @@ async function deleteHunt(id) {
   render();
   try {
     const { changed } = await db("DELETE FROM app_scavenger_hunt__hunts WHERE id=?", [id]);
-    if (changed === 0) throw new Error("This hunt could not be deleted.");
+    if (changed === 0) throw userError("This hunt could not be deleted.");
     submissions = submissions.filter((s) => s.hunt_id !== id);
     tasks = tasks.filter((t) => t.hunt_id !== id);
     awards = awards.filter((a) => a.hunt_id !== id);
@@ -378,18 +378,18 @@ async function deleteHunt(id) {
     // since then stays as it is.
     if (removed && !hunts.some((h) => h.id === id)) hunts = [...hunts, removed];
     if (wasOpen && openHuntId === null) openHuntId = id;
-    showError(e.message);
+    console.error(e);
+    showError(failText(e, "Couldn’t delete the hunt — try again."));
   }
 }
 
 async function addTask(huntId, title, points) {
   const row = { id: crypto.randomUUID(), hunt_id: huntId, title, points, sort_order: huntTasks(tasks, huntId).length, created_by: me.id, created_at: nowIso() };
+  // As in createHunt: drawn, and the form closed, only once the hub has it.
+  await db("INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?,?,?,?,?,?,?)",
+    [row.id, row.hunt_id, row.title, row.points, row.sort_order, row.created_by, row.created_at]);
   tasks = [...tasks, row];
   closeModal(); render();
-  try {
-    await db("INSERT INTO app_scavenger_hunt__tasks (id, hunt_id, title, points, sort_order, created_by, created_at) VALUES (?,?,?,?,?,?,?)",
-      [row.id, row.hunt_id, row.title, row.points, row.sort_order, row.created_by, row.created_at]);
-  } catch (e) { tasks = tasks.filter((t) => t.id !== row.id); showError(e.message); }
 }
 
 async function deleteTask(id) {
@@ -400,13 +400,14 @@ async function deleteTask(id) {
     // delete_cascades.tasks reclaims the submissions and their photos; see the
     // note above deleteHunt for why the client cannot do this itself.
     const { changed } = await db("DELETE FROM app_scavenger_hunt__tasks WHERE id=?", [id]);
-    if (changed === 0) throw new Error("This task could not be removed.");
+    if (changed === 0) throw userError("This task could not be removed.");
     submissions = submissions.filter((s) => s.task_id !== id);
   }
   catch (e) {
     // The one task back, so a second removal that did go through stays gone.
     if (removed && !tasks.some((t) => t.id === id)) tasks = [...tasks, removed];
-    showError(e.message);
+    console.error(e);
+    showError(failText(e, "Couldn’t remove the task — try again."));
   }
 }
 
@@ -442,7 +443,8 @@ async function submitFind(hunt, taskId, file, caption) {
     if (!saved) {
       const refused = e?.refused === true && saved === false;
       if (refused && fileId) files.delete(fileId).catch(() => {});
-      showError(refused ? e.message : "Couldn't confirm your find was saved. Reload to check before trying again.");
+      console.error(e);
+      showError(refused ? "Couldn’t save your find — try again." : "Couldn't confirm your find was saved. Reload to check before trying again.");
       return;
     }
   }
@@ -458,9 +460,9 @@ async function awardPoints(hunt, submissionId, points) {
     render();
     try {
       const { changed } = await db("UPDATE app_scavenger_hunt__awards SET points_awarded=? WHERE id=?", [points, existing.id]);
-      if (changed === 0) throw new Error("Those points could not be changed.");
+      if (changed === 0) throw userError("Those points could not be changed.");
     }
-    catch (e) { Object.assign(existing, prev); showError(e.message); }
+    catch (e) { console.error(e); Object.assign(existing, prev); showError(failText(e, "Couldn’t save the points — try again.")); }
     return;
   }
   const row = { id: crypto.randomUUID(), hunt_id: hunt.id, submission_id: submissionId, points_awarded: points, awarded_by: me.id, created_at: nowIso() };
@@ -469,7 +471,7 @@ async function awardPoints(hunt, submissionId, points) {
   try {
     await db("INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?,?,?,?,?,?)",
       [row.id, row.hunt_id, row.submission_id, row.points_awarded, row.awarded_by, row.created_at]);
-  } catch (e) { awards = awards.filter((a) => a.id !== row.id); showError(e.message); }
+  } catch (e) { console.error(e); awards = awards.filter((a) => a.id !== row.id); showError(failText(e, "Couldn’t save the points — try again.")); }
 }
 
 /* ── Rendering ─────────────────────────────────────────────────────────────── */
@@ -650,7 +652,7 @@ function render() {
       // and one that did not keeps this form, photo and caption included, and
       // needs its button back.
       submitFind(hunt, taskId, file, caption)
-        .catch((err) => showError(err.message))
+        .catch((err) => { console.error(err); showError(failText(err, "Couldn’t save your find — try again.")); })
         .finally(() => { if (btn) { btn.disabled = false; btn.textContent = "Submit find"; } });
     });
   });
@@ -667,12 +669,28 @@ function openModal(html) {
 }
 function closeModal() { modalEl?.remove(); modalEl = null; }
 
+// Sends a modal form's save. The form stays open, as typed, until the save
+// lands; one that fails is said in the form's own error line and the button
+// comes back to send it again.
+function submitModalForm(form, busyLabel, save) {
+  const btn = form.querySelector('button[type="submit"]');
+  const note = form.querySelector("[data-form-error]");
+  if (btn?.disabled) return;
+  const label = btn?.textContent;
+  if (btn) { btn.disabled = true; btn.textContent = busyLabel; }
+  if (note) note.hidden = true;
+  save()
+    .catch((err) => { console.error(err); if (note) { note.textContent = "Couldn’t save — try again."; note.hidden = false; } })
+    .finally(() => { if (btn) { btn.disabled = false; btn.textContent = label; } });
+}
+
 function openHuntEditor() {
   openModal(`
     <h2>New scavenger hunt</h2>
     <form class="form" id="hunt-form">
       <div class="field"><label for="h-title">Title</label><input id="h-title" data-autofocus placeholder="Backyard Safari" required /></div>
       <p class="tiny muted">You'll be the organizer: add things to find, start the hunt, then end it for the big reveal.</p>
+      <div class="error" role="alert" data-form-error hidden></div>
       <div class="modal-actions">
         <button type="button" class="btn btn-ghost" data-cancel>Cancel</button>
         <button type="submit" class="btn">Create</button>
@@ -683,9 +701,7 @@ function openHuntEditor() {
     e.preventDefault();
     const title = document.getElementById("h-title").value.trim();
     if (!title) { document.getElementById("h-title").focus(); return; }
-    const btn = modalEl?.querySelector('button[type="submit"]');
-    if (btn) { btn.disabled = true; btn.textContent = "Creating…"; }
-    createHunt(title).catch((err) => showError(err.message));
+    submitModalForm(e.target, "Creating…", () => createHunt(title));
   });
 }
 
@@ -698,6 +714,7 @@ function openTaskEditor(huntId) {
         <div></div>
         <div class="field"><label for="t-points">Points</label><input id="t-points" type="number" min="1" max="10" value="1" /></div>
       </div>
+      <div class="error" role="alert" data-form-error hidden></div>
       <div class="modal-actions">
         <button type="button" class="btn btn-ghost" data-cancel>Cancel</button>
         <button type="submit" class="btn">Add</button>
@@ -709,9 +726,7 @@ function openTaskEditor(huntId) {
     const title = document.getElementById("t-title").value.trim();
     if (!title) { document.getElementById("t-title").focus(); return; }
     const points = Math.max(1, Math.min(10, Number(document.getElementById("t-points").value) || 1));
-    const btn = modalEl?.querySelector('button[type="submit"]');
-    if (btn) { btn.disabled = true; btn.textContent = "Adding…"; }
-    addTask(huntId, title, points).catch((err) => showError(err.message));
+    submitModalForm(e.target, "Adding…", () => addTask(huntId, title, points));
   });
 }
 
@@ -793,7 +808,8 @@ async function createShareLink(hunt) {
     link = await share.create("hunt", hunt.id, { expiresInHours: hours, label: hunt.title, password });
   } catch (err) {
     if (btn) { btn.disabled = false; btn.textContent = "Create link"; }
-    hubAlert("Couldn't create share link", { description: err.message });
+    console.error(err);
+    hubAlert("Couldn’t create the share link — try again.");
     return;
   }
   try { await navigator.clipboard.writeText(link.url); } catch { /* the re-render shows the url to copy */ }
@@ -814,7 +830,7 @@ async function revokeShareLink(id, hunt) {
   });
   if (!ok) return;
   try { await share.revoke(id); await openShareModal(hunt); }
-  catch (err) { hubAlert("Couldn't revoke share link", { description: err.message }); }
+  catch (err) { console.error(err); hubAlert("Couldn’t revoke the share link — try again."); }
 }
 
 /* ── Events ────────────────────────────────────────────────────────────────── */
@@ -831,15 +847,15 @@ document.addEventListener("click", (e) => {
   if (t.hasAttribute("data-new-hunt")) { openHuntEditor(); return; }
   if (!hunt) return;
   if (t.hasAttribute("data-add-task")) { openTaskEditor(hunt.id); return; }
-  if (t.hasAttribute("data-delete-task")) { deleteTask(t.getAttribute("data-delete-task")).catch((err) => showError(err.message)); return; }
+  if (t.hasAttribute("data-delete-task")) { deleteTask(t.getAttribute("data-delete-task")).catch((err) => { console.error(err); showError(failText(err, "Couldn’t remove the task — try again.")); }); return; }
   if (t.hasAttribute("data-start-hunt")) {
     if (!huntTasks(tasks, hunt.id).length) { hubAlert("Add at least one thing to find first."); return; }
-    setHuntStatus(hunt.id, "open").catch((err) => showError(err.message));
+    setHuntStatus(hunt.id, "open").catch((err) => { console.error(err); showError(failText(err, "Couldn’t start the hunt — try again.")); });
     return;
   }
-  if (t.hasAttribute("data-close-hunt")) { closeHunt(hunt.id).catch((err) => showError(err.message)); return; }
+  if (t.hasAttribute("data-close-hunt")) { closeHunt(hunt.id).catch((err) => { console.error(err); showError(failText(err, "Couldn’t close the hunt — try again.")); }); return; }
   if (t.hasAttribute("data-delete-hunt")) { deleteHunt(hunt.id); return; }
-  if (t.hasAttribute("data-share")) { openShareModal(hunt).catch((err) => showError(err.message)); return; }
+  if (t.hasAttribute("data-share")) { openShareModal(hunt).catch((err) => { console.error(err); showError("Couldn’t load the share links."); }); return; }
   if (t.hasAttribute("data-share-create")) { createShareLink(hunt); return; }
   if (t.hasAttribute("data-share-revoke")) { revokeShareLink(t.getAttribute("data-share-revoke"), hunt); return; }
   if (t.hasAttribute("data-share-copy")) {
@@ -856,7 +872,7 @@ document.addEventListener("click", (e) => {
     const pts = Math.max(0, Math.min(99, Number(input?.value) || 0));
     awardDrafts.delete(sid);
     awarding.add(sid);
-    awardPoints(hunt, sid, pts).finally(() => awarding.delete(sid)).catch((err) => showError(err.message));
+    awardPoints(hunt, sid, pts).finally(() => awarding.delete(sid)).catch((err) => { console.error(err); showError(failText(err, "Couldn’t save the points — try again.")); });
   }
 });
 
