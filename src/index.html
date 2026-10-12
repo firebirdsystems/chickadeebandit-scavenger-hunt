@@ -84,6 +84,8 @@
     .score-name { flex: 1; font-weight: 700; }
     .score-pts { font-weight: 800; }
     .empty { color: var(--muted); text-align: center; padding: 30px 16px; }
+    .load-error { margin: 0 0 12px; padding: 10px 14px; border-radius: 10px; background: var(--hub-tint-danger, #fee2e2); color: var(--hub-tint-danger-fg, #b91c1c); font-size: 0.9rem; display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+    .load-error-retry { background: none; border: 1px solid currentColor; border-radius: 8px; padding: 5px 10px; font: inherit; font-weight: 600; color: inherit; cursor: pointer; flex-shrink: 0; }
     .error { background: var(--red-soft); color: var(--red); padding: 9px 12px; border-radius: 8px; margin-bottom: 10px; font-size: .86rem; }
     .section-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 18px 2px 8px; }
     input, textarea {
@@ -173,14 +175,16 @@ async function db(sql, params = []) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ sql, params }),
   });
-  const json = await res.json();
-  if (json.error) {
+  const json = await res.json().catch(() => null);
+  if (json?.error) {
     // The hub answered, and said no. Told apart from a request that never
     // got an answer, where nothing is known about what was written.
     const refusal = new Error(json.error);
     refusal.refused = true;
     throw refusal;
   }
+  // No readable answer: nothing is known about what was written.
+  if (!res.ok || !json || typeof json !== "object") throw new Error("Couldn’t reach the hub. Try again.");
   return json;
 }
 
@@ -192,10 +196,14 @@ async function loadMembers() {
       { id: "demo-3", name: "Casey", role: "child" },
     ];
   } else {
-    try {
-      const res = await fetch(`${CONTEXT}?keys=family.members`);
-      members = ((await res.json())["family.members"]) ?? [];
-    } catch { members = []; }
+    // Throws when the members cannot be read: refresh() treats it like any
+    // other failed read, so nobody is drawn as "Unknown" on a guess.
+    const res = await fetch(`${CONTEXT}?keys=family.members`);
+    const json = await res.json().catch(() => null);
+    if (!res.ok || !json || typeof json !== "object" || json.error) throw new Error("Couldn’t reach the hub. Try again.");
+    // A 200 can still name a key the hub failed to read: that is a failed read too.
+    if (Array.isArray(json.$errors) && json.$errors.includes("family.members")) throw new Error("Couldn’t reach the hub. Try again.");
+    members = json["family.members"] ?? [];
   }
   memberMap = new Map(members.map((m) => [m.id, m]));
   me = HUB_MEMBER ?? members[0] ?? { id: "guest", name: "Guest", role: "adult" };
@@ -253,13 +261,19 @@ async function loadChildrenFor(huntList) {
   return { tasks: t.rows ?? [], submissions: s.rows ?? [], awards: a.rows ?? [] };
 }
 
+// The first load failed: the hunts are unknown, not absent. A later re-read
+// that fails keeps what is on screen and says so inline.
+let loaded = false;
+let loadFailed = false;
+
 async function refresh() {
   error = "";
   try {
     await Promise.all([loadMembers(), loadData()]);
     if (openHuntId && !hunts.some((h) => h.id === openHuntId)) openHuntId = null;
-    render();
-  } catch (e) { error = e.message; render(); }
+    loaded = true; loadFailed = false;
+  } catch (e) { if (loaded) error = e.message; else loadFailed = true; }
+  render();
 }
 
 function showError(msg) { error = msg; render(); }
@@ -294,7 +308,10 @@ async function setHuntStatus(id, status) {
   if (status === "closed") revealing = id;
   render();
   try {
-    await db("UPDATE app_scavenger_hunt__hunts SET status=?, visibility=? WHERE id=?", [status, visibility, id]);
+    const { changed } = await db("UPDATE app_scavenger_hunt__hunts SET status=?, visibility=? WHERE id=?", [status, visibility, id]);
+    // Only the organizer may write a hunt; the hub answers anyone else, or a
+    // hunt already deleted, with zero rows rather than an error.
+    if (changed === 0) throw new Error("This hunt can no longer be changed.");
     if (status === "closed") {
       await refresh(); // sealed submissions just released
       // The reveal is on the page now; the announcement below is not part of it.
@@ -350,7 +367,8 @@ async function deleteHunt(id) {
   if (wasOpen) openHuntId = null;
   render();
   try {
-    await db("DELETE FROM app_scavenger_hunt__hunts WHERE id=?", [id]);
+    const { changed } = await db("DELETE FROM app_scavenger_hunt__hunts WHERE id=?", [id]);
+    if (changed === 0) throw new Error("This hunt could not be deleted.");
     submissions = submissions.filter((s) => s.hunt_id !== id);
     tasks = tasks.filter((t) => t.hunt_id !== id);
     awards = awards.filter((a) => a.hunt_id !== id);
@@ -381,7 +399,8 @@ async function deleteTask(id) {
   try {
     // delete_cascades.tasks reclaims the submissions and their photos; see the
     // note above deleteHunt for why the client cannot do this itself.
-    await db("DELETE FROM app_scavenger_hunt__tasks WHERE id=?", [id]);
+    const { changed } = await db("DELETE FROM app_scavenger_hunt__tasks WHERE id=?", [id]);
+    if (changed === 0) throw new Error("This task could not be removed.");
     submissions = submissions.filter((s) => s.task_id !== id);
   }
   catch (e) {
@@ -437,7 +456,10 @@ async function awardPoints(hunt, submissionId, points) {
     const prev = { ...existing };
     existing.points_awarded = points;
     render();
-    try { await db("UPDATE app_scavenger_hunt__awards SET points_awarded=? WHERE id=?", [points, existing.id]); }
+    try {
+      const { changed } = await db("UPDATE app_scavenger_hunt__awards SET points_awarded=? WHERE id=?", [points, existing.id]);
+      if (changed === 0) throw new Error("Those points could not be changed.");
+    }
     catch (e) { Object.assign(existing, prev); showError(e.message); }
     return;
   }
@@ -472,6 +494,14 @@ document.addEventListener("input", (e) => {
 });
 
 function renderHuntList() {
+  if (loadFailed) return `
+    <div class="topbar">
+      <div>
+        <h1>${glyph("magnifier")} Scavenger Hunt</h1>
+        <p class="muted tiny">Everyone hunts in secret. Photos reveal all at once.</p>
+      </div>
+    </div>
+    <div class="load-error" data-testid="load-error" role="alert"><span>Couldn’t load the hunts.</span> <button type="button" class="load-error-retry" data-testid="load-retry">Try again</button></div>`;
   const all = visibleHunts(hunts, me);
   const list = searchQ
     ? all.filter((h) => searchMatch(searchQ, searchableFields(h, memberName(h.created_by))))
@@ -794,6 +824,7 @@ document.addEventListener("click", (e) => {
   // A message is about the action that raised it; the next one starts clean.
   error = "";
   const hunt = openHuntId ? hunts.find((h) => h.id === openHuntId) : null;
+  if (t.dataset.testid === "load-retry") { refresh(); return; }
   if (t.hasAttribute("data-open")) { openHuntId = t.getAttribute("data-open"); render(); return; }
   if (t.hasAttribute("data-back")) { openHuntId = null; render(); return; }
   if (t.hasAttribute("data-cancel")) { closeModal(); return; }
