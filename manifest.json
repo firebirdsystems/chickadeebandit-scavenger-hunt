@@ -136,7 +136,7 @@
         {
           "table": "submissions",
           "foreign_key": "hunt_id",
-          "file_id_column": "photo_file_id"
+          "file_id_column": ["photo_file_id", "thumb_file_id"]
         },
         {
           "table": "awards",

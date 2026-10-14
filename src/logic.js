@@ -102,3 +102,42 @@ export function tilePhotoId(submission) {
 export function searchableFields(hunt, organizerName = "") {
   return [hunt.title, organizerName];
 }
+
+/**
+ * The line a failed write shows, from the error's status — never the hub's
+ * text. "Try again" only where trying again can work. `found` is the caller's
+ * re-read after a write that changed nothing (true: the row is still there).
+ */
+export function failureLine(e, { action, thing, found } = {}) {
+  if (e?.forUser) return e.message;
+  if (e?.code === "UNIQUE_CONSTRAINT" || /UNIQUE constraint failed/i.test(String(e?.message ?? ""))) return `That ${thing} already exists.`;
+  if (e?.status === 403) return `You don’t have permission to ${action}.`;
+  if (e?.status === 507) return "The household’s storage is full — free up space first.";
+  if (e?.status === 429) return "Too many tries — wait a minute and try again.";
+  if (found === false || (found === undefined && e?.status === 404)) return `This ${thing} has been removed.`;
+  if (found === true) return `You don’t have permission to ${action}.`;
+  if (e?.status === 409 || e?.status === 404) return `This ${thing} was changed by someone else — check it first.`;
+  return `Couldn’t ${action} — try again.`;
+}
+
+/** A failed photo upload: the files endpoint answers 413 too large and 415
+ *  a type it will not store; the rest follow the table. */
+export function photoUploadLine(e) {
+  if (e?.status === 413) return "That photo is too large.";
+  if (e?.status === 415) return "That kind of file can’t be uploaded.";
+  return failureLine(e, { action: "upload the photo", thing: "photo" });
+}
+
+/**
+ * A find the hub refused. Read after a re-read of the hunts: the hunt ending
+ * (it is frozen once closed) and a find already sent for the task (one per
+ * task) are the refusals a hunter can act on; the rest follow the table.
+ */
+export function findRefusedLine(e, { huntStatus, alreadySent } = {}) {
+  if (huntStatus === "closed") return "This hunt has ended — no more finds.";
+  if (huntStatus === null) return "This hunt has been removed.";
+  if (alreadySent) return "You already sent a find for this task.";
+  // A brand-new find has nothing for someone else to have changed.
+  if (e?.status === 409) return "Couldn’t send your find — try again.";
+  return failureLine(e, { action: "send your find", thing: "find" });
+}

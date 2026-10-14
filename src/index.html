@@ -128,6 +128,7 @@ import { esc, isAdult, hubConfirm, hubAlert, createFilesHelper, createShareHelpe
 import {
   isOrganizer, statusLabel, visibleHunts, huntTasks, submissionFor,
   foundCount, awardBySubmission, scoreboard, searchableFields, tilePhotoId, huntVisibility, misfiledHunts,
+  failureLine, photoUploadLine, findRefusedLine,
 } from "./logic.js";
 
 const CONTEXT = window.__CONTEXT_URL ?? "";
@@ -179,12 +180,15 @@ async function db(sql, params = []) {
   if (json?.error) {
     // The hub answered, and said no. Told apart from a request that never
     // got an answer, where nothing is known about what was written.
+    // Its status (and `code`) pick the line shown; the text stays in the console.
     const refusal = new Error(json.error);
     refusal.refused = true;
+    refusal.status = res.status;
+    if (typeof json.code === "string") refusal.code = json.code;
     throw refusal;
   }
   // No readable answer: nothing is known about what was written.
-  if (!res.ok || !json || typeof json !== "object") throw new Error("Couldn’t reach the hub. Try again.");
+  if (!res.ok || !json || typeof json !== "object") throw Object.assign(new Error("Couldn’t reach the hub. Try again."), { status: res.status });
   return json;
 }
 
@@ -278,9 +282,8 @@ async function refresh() {
 
 function showError(msg) { error = msg; render(); }
 // Wording this app wrote for the reader is marked where it is thrown; any
-// other failure is said in the app's own fixed line, never the hub's text.
+// other failure is said by failureLine from its status, never the hub's text.
 function userError(msg) { return Object.assign(new Error(msg), { forUser: true }); }
-function failText(e, line) { return e?.forUser ? e.message : line; }
 
 /* ── Mutations ─────────────────────────────────────────────────────────────── */
 async function createHunt(title) {
@@ -327,7 +330,7 @@ async function setHuntStatus(id, status) {
         organizer_id: prev.created_by,
       });
     }
-  } catch (e) { console.error(e); hunts = hunts.map((h) => (h.id === id ? prev : h)); showError(failText(e, "Couldn’t update the hunt — try again.")); }
+  } catch (e) { console.error(e); hunts = hunts.map((h) => (h.id === id ? prev : h)); showError(failureLine(e, { action: "update the hunt", thing: "hunt" })); }
   finally {
     if (revealing === id) { revealing = null; render(); }
   }
@@ -379,7 +382,7 @@ async function deleteHunt(id) {
     if (removed && !hunts.some((h) => h.id === id)) hunts = [...hunts, removed];
     if (wasOpen && openHuntId === null) openHuntId = id;
     console.error(e);
-    showError(failText(e, "Couldn’t delete the hunt — try again."));
+    showError(failureLine(e, { action: "delete the hunt", thing: "hunt" }));
   }
 }
 
@@ -407,7 +410,7 @@ async function deleteTask(id) {
     // The one task back, so a second removal that did go through stays gone.
     if (removed && !tasks.some((t) => t.id === id)) tasks = [...tasks, removed];
     console.error(e);
-    showError(failText(e, "Couldn’t remove the task — try again."));
+    showError(failureLine(e, { action: "remove the task", thing: "task" }));
   }
 }
 
@@ -419,7 +422,7 @@ async function submitFind(hunt, taskId, file, caption) {
       const up = await files.upload(file, { thumbnail: true });
       fileId = up.id;
       thumbId = up.thumbnailId ?? null;
-    } catch (e) { showError(`Photo upload failed: ${e.message}`); return; }
+    } catch (e) { console.error(e); showError(photoUploadLine(e)); return; }
   }
   const row = { id: crypto.randomUUID(), hunt_id: hunt.id, task_id: taskId, member_id: me.id, photo_file_id: fileId, thumb_file_id: thumbId, caption, created_at: nowIso() };
   // Not drawn as sealed until it is: the form stays as it is, "Sealing…", with
@@ -444,7 +447,18 @@ async function submitFind(hunt, taskId, file, caption) {
       const refused = e?.refused === true && saved === false;
       if (refused && fileId) files.delete(fileId).catch(() => {});
       console.error(e);
-      showError(refused ? "Couldn’t save your find — try again." : "Couldn't confirm your find was saved. Reload to check before trying again.");
+      if (!refused) { showError("Couldn't confirm your find was saved. Reload to check before trying again."); return; }
+      // A refusal from the hunt's state (it ended, or this task already has
+      // your find): read again, so the line says which. The form is kept.
+      let reread = {};
+      if (e?.status === 403 || e?.status === 409) {
+        await refresh();
+        if (!error) {
+          const now = hunts.find((h) => h.id === hunt.id);
+          reread = { huntStatus: now ? now.status : null, alreadySent: !!submissionFor(submissions, taskId, me.id) };
+        }
+      }
+      showError(findRefusedLine(e, reread));
       return;
     }
   }
@@ -462,7 +476,7 @@ async function awardPoints(hunt, submissionId, points) {
       const { changed } = await db("UPDATE app_scavenger_hunt__awards SET points_awarded=? WHERE id=?", [points, existing.id]);
       if (changed === 0) throw userError("Those points could not be changed.");
     }
-    catch (e) { console.error(e); Object.assign(existing, prev); showError(failText(e, "Couldn’t save the points — try again.")); }
+    catch (e) { console.error(e); Object.assign(existing, prev); showError(failureLine(e, { action: "save the points", thing: "award" })); }
     return;
   }
   const row = { id: crypto.randomUUID(), hunt_id: hunt.id, submission_id: submissionId, points_awarded: points, awarded_by: me.id, created_at: nowIso() };
@@ -471,7 +485,7 @@ async function awardPoints(hunt, submissionId, points) {
   try {
     await db("INSERT INTO app_scavenger_hunt__awards (id, hunt_id, submission_id, points_awarded, awarded_by, created_at) VALUES (?,?,?,?,?,?)",
       [row.id, row.hunt_id, row.submission_id, row.points_awarded, row.awarded_by, row.created_at]);
-  } catch (e) { console.error(e); awards = awards.filter((a) => a.id !== row.id); showError(failText(e, "Couldn’t save the points — try again.")); }
+  } catch (e) { console.error(e); awards = awards.filter((a) => a.id !== row.id); showError(failureLine(e, { action: "save the points", thing: "award" })); }
 }
 
 /* ── Rendering ─────────────────────────────────────────────────────────────── */
@@ -652,7 +666,7 @@ function render() {
       // and one that did not keeps this form, photo and caption included, and
       // needs its button back.
       submitFind(hunt, taskId, file, caption)
-        .catch((err) => { console.error(err); showError(failText(err, "Couldn’t save your find — try again.")); })
+        .catch((err) => { console.error(err); showError(failureLine(err, { action: "send your find", thing: "find" })); })
         .finally(() => { if (btn) { btn.disabled = false; btn.textContent = "Submit find"; } });
     });
   });
@@ -680,7 +694,7 @@ function submitModalForm(form, busyLabel, save) {
   if (btn) { btn.disabled = true; btn.textContent = busyLabel; }
   if (note) note.hidden = true;
   save()
-    .catch((err) => { console.error(err); if (note) { note.textContent = "Couldn’t save — try again."; note.hidden = false; } })
+    .catch((err) => { console.error(err); if (note) { note.textContent = failureLine(err, { action: "save", thing: "entry" }); note.hidden = false; } })
     .finally(() => { if (btn) { btn.disabled = false; btn.textContent = label; } });
 }
 
@@ -847,13 +861,13 @@ document.addEventListener("click", (e) => {
   if (t.hasAttribute("data-new-hunt")) { openHuntEditor(); return; }
   if (!hunt) return;
   if (t.hasAttribute("data-add-task")) { openTaskEditor(hunt.id); return; }
-  if (t.hasAttribute("data-delete-task")) { deleteTask(t.getAttribute("data-delete-task")).catch((err) => { console.error(err); showError(failText(err, "Couldn’t remove the task — try again.")); }); return; }
+  if (t.hasAttribute("data-delete-task")) { deleteTask(t.getAttribute("data-delete-task")).catch((err) => { console.error(err); showError(failureLine(err, { action: "remove the task", thing: "task" })); }); return; }
   if (t.hasAttribute("data-start-hunt")) {
     if (!huntTasks(tasks, hunt.id).length) { hubAlert("Add at least one thing to find first."); return; }
-    setHuntStatus(hunt.id, "open").catch((err) => { console.error(err); showError(failText(err, "Couldn’t start the hunt — try again.")); });
+    setHuntStatus(hunt.id, "open").catch((err) => { console.error(err); showError(failureLine(err, { action: "start the hunt", thing: "hunt" })); });
     return;
   }
-  if (t.hasAttribute("data-close-hunt")) { closeHunt(hunt.id).catch((err) => { console.error(err); showError(failText(err, "Couldn’t close the hunt — try again.")); }); return; }
+  if (t.hasAttribute("data-close-hunt")) { closeHunt(hunt.id).catch((err) => { console.error(err); showError(failureLine(err, { action: "close the hunt", thing: "hunt" })); }); return; }
   if (t.hasAttribute("data-delete-hunt")) { deleteHunt(hunt.id); return; }
   if (t.hasAttribute("data-share")) { openShareModal(hunt).catch((err) => { console.error(err); showError("Couldn’t load the share links."); }); return; }
   if (t.hasAttribute("data-share-create")) { createShareLink(hunt); return; }
@@ -872,7 +886,7 @@ document.addEventListener("click", (e) => {
     const pts = Math.max(0, Math.min(99, Number(input?.value) || 0));
     awardDrafts.delete(sid);
     awarding.add(sid);
-    awardPoints(hunt, sid, pts).finally(() => awarding.delete(sid)).catch((err) => { console.error(err); showError(failText(err, "Couldn’t save the points — try again.")); });
+    awardPoints(hunt, sid, pts).finally(() => awarding.delete(sid)).catch((err) => { console.error(err); showError(failureLine(err, { action: "save the points", thing: "award" })); });
   }
 });
 

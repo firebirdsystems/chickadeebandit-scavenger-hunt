@@ -84,14 +84,14 @@ describe("shareable.hunt", () => {
 
   it("carries photos through the scalar column the reclaim paths own", () => {
     // photo_file_id is a bare id, not a JSON array. It is what
-    // delete_file_columns / delete_cascades / member_references / retain_days
+    // file_columns / delete_cascades / member_references / retention
     // all reclaim, and the hub reads that shape directly — a second
     // JSON-encoded copy would be file ids no reclaim path tracks.
     expect(feed.files_column).toBe("photo_file_id");
     expect(columnsOf("submissions")).toContain(feed.files_column);
-    expect(manifest.delete_file_columns.submissions).toContain(feed.files_column);
-    for (const dep of manifest.row_policies.hunts.retain_days.dependent_tables) {
-      if (dep.table === "submissions") expect(dep.file_id_column).toBe(feed.files_column);
+    expect(manifest.file_columns.submissions.columns).toContain(feed.files_column);
+    for (const dep of manifest.retention.hunts.dependent_tables) {
+      if (dep.table === "submissions") expect(dep.file_id_column).toEqual([feed.files_column, "thumb_file_id"]);
     }
   });
 
