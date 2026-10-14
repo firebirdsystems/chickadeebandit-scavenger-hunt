@@ -83,27 +83,7 @@
       "everyone_values": [
         "everyone"
       ],
-      "write_owner_only": true,
-      "retain_days": {
-        "default": 365,
-        "timestamp_column": "created_at",
-        "override_key": "hunt_history",
-        "dependent_tables": [
-          {
-            "table": "tasks",
-            "foreign_key": "hunt_id"
-          },
-          {
-            "table": "submissions",
-            "foreign_key": "hunt_id",
-            "file_id_column": "photo_file_id"
-          },
-          {
-            "table": "awards",
-            "foreign_key": "hunt_id"
-          }
-        ]
-      }
+      "write_owner_only": true
     },
     "tasks": {
       "kind": "inherit_visibility",
@@ -143,11 +123,30 @@
       "insert_only_by_parent_column_member": "created_by"
     }
   },
-  "delete_file_columns": {
-    "submissions": [
-      "photo_file_id",
-      "thumb_file_id"
-    ]
+  "retention": {
+    "hunts": {
+      "default": 365,
+      "timestamp_column": "created_at",
+      "override_key": "hunt_history",
+      "dependent_tables": [
+        {
+          "table": "tasks",
+          "foreign_key": "hunt_id"
+        },
+        {
+          "table": "submissions",
+          "foreign_key": "hunt_id",
+          "file_id_column": "photo_file_id"
+        },
+        {
+          "table": "awards",
+          "foreign_key": "hunt_id"
+        }
+      ]
+    }
+  },
+  "file_columns": {
+    "submissions": { "columns": ["photo_file_id", "thumb_file_id"] }
   },
   "delete_cascades": {
     "hunts": [
@@ -218,8 +217,5 @@
     "hunt.closed": {
       "require_role": "member"
     }
-  },
-  "resource_limits": {
-    "max_db_bytes": 52428800
   }
 }
