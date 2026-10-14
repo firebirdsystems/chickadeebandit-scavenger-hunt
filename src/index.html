@@ -128,7 +128,7 @@ import { esc, isAdult, hubConfirm, hubAlert, createFilesHelper, createShareHelpe
 import {
   isOrganizer, statusLabel, visibleHunts, huntTasks, submissionFor,
   foundCount, awardBySubmission, scoreboard, searchableFields, tilePhotoId, huntVisibility, misfiledHunts,
-  failureLine, photoUploadLine, findRefusedLine,
+  failureLine, photoUploadLine, findRefusedLine, shareFailureLine,
 } from "./logic.js";
 
 const CONTEXT = window.__CONTEXT_URL ?? "";
@@ -447,7 +447,7 @@ async function submitFind(hunt, taskId, file, caption) {
       const refused = e?.refused === true && saved === false;
       if (refused && fileId) files.delete(fileId).catch(() => {});
       console.error(e);
-      if (!refused) { showError("Couldn't confirm your find was saved. Reload to check before trying again."); return; }
+      if (!refused) { showError("Couldn’t confirm your find was saved. Reload to check before trying again."); return; }
       // A refusal from the hunt's state (it ended, or this task already has
       // your find): read again, so the line says which. The form is kept.
       let reread = {};
@@ -823,7 +823,12 @@ async function createShareLink(hunt) {
   } catch (err) {
     if (btn) { btn.disabled = false; btn.textContent = "Create link"; }
     console.error(err);
-    hubAlert("Couldn’t create the share link — try again.");
+    // A refusal says what happened; only a failure (no answer, a 5xx) asks for
+    // a retry. A 402 for a password or a longer expiry is the plan; on a plain
+    // link it is the free plan's link cap (shareFailureLine).
+    hubAlert(err?.status === 402 && (password || hours > 720)
+      ? "A password or a longer expiry needs an active plan."
+      : shareFailureLine(err, { action: "create the share link", thing: "hunt" }));
     return;
   }
   try { await navigator.clipboard.writeText(link.url); } catch { /* the re-render shows the url to copy */ }
@@ -843,8 +848,15 @@ async function revokeShareLink(id, hunt) {
     confirmLabel: "Revoke",
   });
   if (!ok) return;
-  try { await share.revoke(id); await openShareModal(hunt); }
-  catch (err) { console.error(err); hubAlert("Couldn’t revoke the share link — try again."); }
+  try { await share.revoke(id); }
+  catch (err) {
+    console.error(err);
+    // A 404 is a link the hub no longer has: done; the refresh below drops it.
+    if (err?.status !== 404) { hubAlert(shareFailureLine(err, { action: "revoke the share link", thing: "hunt" })); return; }
+  }
+  // The link is revoked: a list that will not refresh is not a failed revoke.
+  try { await openShareModal(hunt); }
+  catch (err) { console.error(err); closeModal(); hubAlert("Link revoked", { description: "Couldn’t refresh the list — open Share again to see it." }); }
 }
 
 /* ── Events ────────────────────────────────────────────────────────────────── */
