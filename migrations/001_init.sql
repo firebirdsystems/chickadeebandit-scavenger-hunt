@@ -19,7 +19,7 @@
 -- `awards`: organizer-only INSERT (same parent-column gate); one per
 -- submission; the scoreboard derives from these.
 CREATE TABLE IF NOT EXISTS app_scavenger_hunt__hunts (
-  id         TEXT PRIMARY KEY,
+  id         TEXT NOT NULL PRIMARY KEY,
   title      TEXT NOT NULL,                    -- "Backyard Safari"
   status     TEXT NOT NULL DEFAULT 'draft',    -- draft|open|closed
   visibility TEXT NOT NULL DEFAULT 'everyone',
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS app_scavenger_hunt__hunts (
 );
 
 CREATE TABLE IF NOT EXISTS app_scavenger_hunt__tasks (
-  id         TEXT PRIMARY KEY,
+  id         TEXT NOT NULL PRIMARY KEY,
   hunt_id    TEXT NOT NULL,
   title      TEXT NOT NULL,                    -- "Something older than Dad"
   points     INTEGER NOT NULL DEFAULT 1 CHECK (points > 0),
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS app_scavenger_hunt__tasks (
 );
 
 CREATE TABLE IF NOT EXISTS app_scavenger_hunt__submissions (
-  id            TEXT PRIMARY KEY,
+  id            TEXT NOT NULL PRIMARY KEY,
   hunt_id       TEXT NOT NULL,
   task_id       TEXT NOT NULL,
   member_id     TEXT NOT NULL,
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS app_scavenger_hunt__submissions (
 );
 
 CREATE TABLE IF NOT EXISTS app_scavenger_hunt__awards (
-  id             TEXT PRIMARY KEY,
+  id             TEXT NOT NULL PRIMARY KEY,
   hunt_id        TEXT NOT NULL,
   submission_id  TEXT NOT NULL,
   points_awarded INTEGER NOT NULL DEFAULT 0 CHECK (points_awarded >= 0),
